@@ -1,0 +1,153 @@
+{
+  "criteria": {
+    "min_statements": 150,
+    "min_coverage": 80.0,
+    "exclude_stems": [
+      "__init__",
+      "_version",
+      "compat",
+      "conftest",
+      "setup",
+      "version"
+    ],
+    "budget_cpu_hours_per_project": 3.0,
+    "max_modules_per_project": 4,
+    "quadrant_stratified": "A/B 各至少一个，保住弱断言 vs 强断言的对比",
+    "within_quadrant_rule": "语句数最多且预算装得下（中性标准，不偏向便宜模块）",
+    "stability": "软约束：优先稳定模块，但不牺牲 A/B 对比"
+  },
+  "selected": {
+    "attrs": [
+      {
+        "module": "validators.py",
+        "quadrant": "A",
+        "stable": true,
+        "statements": 220,
+        "coverage": 100.0,
+        "assert_density": 30.82,
+        "mutants": 440,
+        "cpu_hours": 0.332
+      }
+    ],
+    "click": [
+      {
+        "module": "types.py",
+        "quadrant": "A",
+        "stable": false,
+        "statements": 413,
+        "coverage": 89.59,
+        "assert_density": 12.62,
+        "mutants": 826,
+        "cpu_hours": 1.269
+      },
+      {
+        "module": "parser.py",
+        "quadrant": "B",
+        "stable": false,
+        "statements": 250,
+        "coverage": 95.2,
+        "assert_density": 35.48,
+        "mutants": 500,
+        "cpu_hours": 0.945
+      },
+      {
+        "module": "shell_completion.py",
+        "quadrant": "A",
+        "stable": false,
+        "statements": 200,
+        "coverage": 89.5,
+        "assert_density": 6.85,
+        "mutants": 400,
+        "cpu_hours": 0.593
+      }
+    ],
+    "dateutil": [
+      {
+        "module": "rrule.py",
+        "quadrant": "A",
+        "stable": true,
+        "statements": 979,
+        "coverage": 94.18,
+        "assert_density": 28.43,
+        "mutants": 1958,
+        "cpu_hours": 2.086
+      },
+      {
+        "module": "relativedelta.py",
+        "quadrant": "B",
+        "stable": true,
+        "statements": 241,
+        "coverage": 100.0,
+        "assert_density": 50.57,
+        "mutants": 482,
+        "cpu_hours": 0.432
+      },
+      {
+        "module": "tz/win.py",
+        "quadrant": "A",
+        "stable": true,
+        "statements": 152,
+        "coverage": 87.5,
+        "assert_density": 16.67,
+        "mutants": 304,
+        "cpu_hours": 0.258
+      }
+    ],
+    "jinja": [
+      {
+        "module": "nodes.py",
+        "quadrant": "A",
+        "stable": true,
+        "statements": 555,
+        "coverage": 89.55,
+        "assert_density": 12.58,
+        "mutants": 1110,
+        "cpu_hours": 1.186
+      },
+      {
+        "module": "environment.py",
+        "quadrant": "B",
+        "stable": false,
+        "statements": 588,
+        "coverage": 88.78,
+        "assert_density": 19.05,
+        "mutants": 1176,
+        "cpu_hours": 1.494
+      }
+    ],
+    "marshmallow": [
+      {
+        "module": "utils.py",
+        "quadrant": "A",
+        "stable": true,
+        "statements": 177,
+        "coverage": 96.05,
+        "assert_density": 87.68,
+        "mutants": 354,
+        "cpu_hours": 0.369
+      },
+      {
+        "module": "validate.py",
+        "quadrant": "B",
+        "stable": true,
+        "statements": 280,
+        "coverage": 98.93,
+        "assert_density": 100.25,
+        "mutants": 560,
+        "cpu_hours": 0.563
+      },
+      {
+        "module": "schema.py",
+        "quadrant": "A",
+        "stable": false,
+        "statements": 461,
+        "coverage": 99.13,
+        "assert_density": 89.38,
+        "mutants": 922,
+        "cpu_hours": 1.2
+      }
+    ]
+  },
+  "total_cpu_hours": 10.73,
+  "total_mutants": 9032
+}

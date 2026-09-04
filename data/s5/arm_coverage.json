@@ -1,0 +1,739 @@
+{
+  "model": "deepseek-v4-flash",
+  "arm": "coverage",
+  "n": 40,
+  "status_count": {
+    "suspected_equivalent": 36,
+    "killed": 4
+  },
+  "compile_pass_rate": 100.0,
+  "kill_rate": 10.0,
+  "avg_rounds_killed": 2.0,
+  "cheat_rate": 3.723404255319149,
+  "results": [
+    {
+      "mutant_id": "d00a8fdaa284",
+      "project": "attrs",
+      "module": "validators.py",
+      "line": 182,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import re\nimport pytest\nfrom attr.validators import matches_re\n\ndef test_kill_matches_re_variation():\n    # Test with a pattern that has flags, to detect if the implementation\n    # incorrectly compiles the pattern without flags or mishandles flags\n    pattern = re.compile(r\"^[a-z]+$\", re.IGNORECASE)\n    validator = matches_re(pattern)\n    \n    # This should pass with the original code (case-insensitive match)\n    validator(None, None, \"Hello\")\n    \n    # This should also pass with the original code (case-insensitive match)\n    # But if the mutation breaks flag handling, it might incorrectly reject\n    validator(None, None, \"HELLO\")\n    \n    # Additional check: verify that the validator actually uses the pattern's flags\n    # by testing a string that would only match with IGNORECASE\n    # If the mutation strips flags, this would fail\n    validator(None, None, \"hello\")\n    \n    # Test with a pattern that has MULTILINE flag\n    pattern_ml = re.compile(r\"^test$\", re.MULTILINE)\n    validator_ml = matches_re(pattern_ml)\n    # This should pass with original code (multiline allows matching after newline)\n    validator_ml(None, None, \"abc\\ntest\")\n    \n    # This should fail with original code (no match without multiline)\n    with pytest.raises(ValueError):\n        validator_ml(None, None, \"abc\\ntest\")\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 5540,
+        "completion_tokens": 1212,
+        "total_tokens": 6752
+      }
+    },
+    {
+      "mutant_id": "8607eccf3b2d",
+      "project": "click",
+      "module": "types.py",
+      "line": 391,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import datetime\nimport pytest\nfrom click.types import DateTime\nfrom click.exceptions import BadParameter\n\ndef test_datetime_option_default_kill_mutant():\n    \"\"\"Test that DateTime correctly parses datetime strings with time component\n    and preserves the exact time values.\"\"\"\n    dt_type = DateTime()\n    \n    # Test with a datetime string that has time component\n    test_value = \"2020-01-01T12:30:45\"\n    result = dt_type.convert(test_value, None, None)\n    \n    # The expected result should have the exact time values\n    assert result.year == 2020\n    assert result.month == 1\n    assert result.day == 1\n    assert result.hour == 12\n    assert result.minute == 30\n    assert result.second == 45\n    assert result.microsecond == 0\n    \n    # Test with a different time to ensure parsing is correct\n    test_value2 = \"2023-06-15T23:59:59\"\n    result2 = dt_type.convert(test_value2, None, None)\n    assert result2.year == 2023\n    assert result2.month == 6\n    assert result2.day == 15\n    assert result2.hour == 23\n    assert result2.minute == 59\n    assert result2.second == 59\n    assert result2.microsecond == 0\n    \n    # Test with space separator format\n    test_value3 = \"2021-03-10 08:15:30\"\n    result3 = dt_type.convert(test_value3, None, None)\n    assert result3.year == 2021\n    assert result3.month == 3\n    assert result3.day == 10\n    assert result3.hour == 8\n    assert result3.minute == 15\n    assert result3.second == 30\n    assert result3.microsecond == 0\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6179,
+        "completion_tokens": 1375,
+        "total_tokens": 7554
+      }
+    },
+    {
+      "mutant_id": "06a24fd91cee",
+      "project": "click",
+      "module": "parser.py",
+      "line": 488,
+      "operator": "ROR",
+      "description": "GreaterThan → GreaterThanEqual",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.parser import OptionParser\nfrom click.parser import ParsingState\n\ndef test_mutation_488():\n    parser = OptionParser()\n    # 使用正确的add_option参数\n    parser.add_option(\"--foo\", nargs=1, multiple=True)\n    parser.add_option(\"--bar\", nargs=1, multiple=True)\n    \n    # 构造一个包含可选值选项的场景，覆盖第488行\n    # 该行通常处理选项参数的分割逻辑\n    state = ParsingState()\n    state.rargs = [\"--foo\", \"value1\", \"--bar\", \"value2\"]\n    state.opts = {}\n    state.largs = []\n    \n    # 模拟解析过程\n    parser._process_args_for_options(state)\n    \n    # 验证多个选项的可选值都被正确解析\n    assert state.opts[\"--foo\"] == [\"value1\"]\n    assert state.opts[\"--bar\"] == [\"value2\"]\n    assert state.largs == []\n",
+      "rounds": 5,
+      "tautological_rounds": 1,
+      "usage": {
+        "prompt_tokens": 21090,
+        "completion_tokens": 4910,
+        "total_tokens": 26000
+      }
+    },
+    {
+      "mutant_id": "6d6e1b0a3030",
+      "project": "click",
+      "module": "parser.py",
+      "line": 438,
+      "operator": "ARG",
+      "description": "NoSuchOption(opt, ctx=self.ctx) → NoSuchOption(None, ctx=self.ctx)",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.parser import OptionParser\n\n\ndef test_mutation_parser_line_438():\n    \"\"\"Test that exercises parser.py line 438 behavior with unknown options.\"\"\"\n    # Create a parser with an option that takes a value\n    parser = OptionParser()\n    \n    # Add an option that requires a value\n    parser.add_option(\n        \"-f\", \"--foo\",\n        dest=\"foo\",\n        action=\"store\"\n    )\n    \n    # Test with an unknown option that looks like it could be confused\n    # with the known option -f (this is what the existing tests cover)\n    args = [\"-f\", \"value\", \"--unknown\"]\n    \n    # Parse the arguments - this should raise an error about unknown option\n    with pytest.raises(Exception) as excinfo:\n        parser.parse_args(args)\n    \n    # The error message should mention the unknown option\n    assert \"unknown\" in str(excinfo.value).lower() or \"no such option\" in str(excinfo.value).lower()\n    \n    # Also test with the option that has multiple values scenario\n    # This exercises the same line from a different angle\n    parser2 = OptionParser()\n    parser2.add_option(\n        \"-f\", \"--foo\",\n        dest=\"foo\",\n        action=\"append\"\n    )\n    \n    # Parse with multiple -f options and an unknown option\n    args2 = [\"-f\", \"val1\", \"-f\", \"val2\", \"--unknown\"]\n    \n    with pytest.raises(Exception) as excinfo2:\n        parser2.parse_args(args2)\n    \n    assert \"unknown\" in str(excinfo2.value).lower() or \"no such option\" in str(excinfo2.value).lower()\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 7501,
+        "completion_tokens": 1863,
+        "total_tokens": 9364
+      }
+    },
+    {
+      "mutant_id": "1ffacaf9f4e1",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 536,
+      "operator": "ARG",
+      "description": "command.resolve_command(ctx, args) → command.resolve_command(None, args)",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.shell_completion import CompletionItem\nfrom click.shell_completion import ShellComplete\nfrom click.testing import CliRunner\nimport click\n\n\nclass CustomShell(ShellComplete):\n    name = \"custom\"\n    def source(self):\n        return \"source\"\n\n    def format_completion(self, item):\n        return item.value\n\n\ndef test_chained_mutation_kill():\n    \"\"\"Test that chained completion items are handled correctly.\"\"\"\n    @click.group()\n    def cli():\n        pass\n\n    @cli.group()\n    def sub():\n        pass\n\n    @sub.command()\n    def cmd():\n        pass\n\n    # Create a shell completion instance that uses the chained logic\n    shell = CustomShell(cli, {}, \"cli\", [\"sub\", \"cmd\"])\n    \n    # Get completions for the chained command - args should be a list\n    completions = shell.get_completions([\"sub\", \"cmd\"], \"cmd\")\n    \n    # The key behavior: when completing a chained command, \n    # the completion should include the command itself as a completion item\n    # This tests the logic around line 536 which handles chained command completion\n    # For a chained command, the completion should suggest the subcommand's options\n    # or the next command in the chain\n    assert len(completions) > 0\n    \n    # Verify the completion items have proper values\n    for item in completions:\n        assert item.value is not None\n        assert isinstance(item.value, str)\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 7066,
+        "completion_tokens": 1640,
+        "total_tokens": 8706
+      }
+    },
+    {
+      "mutant_id": "8592b3b13da2",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 462,
+      "operator": "ROR",
+      "description": "GreaterThan → GreaterThanEqual",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import click\nfrom click.shell_completion import CompletionItem\nfrom click.shell_completion import BashComplete\nfrom click.testing import CliRunner\nimport os\n\n\ndef test_mutation_sensitive_462():\n    \"\"\"\n    This test targets the behavior at line 462 in shell_completion.py.\n    Based on the existing tests (test_argument_default, test_argument_order,\n    test_argument_nargs, test_option_custom), line 462 is likely in the\n    `_get_completion_info` or similar method that handles argument/option\n    completion info generation. We construct a scenario that exercises\n    the exact code path with a combination of arguments and options\n    that would be sensitive to the mutation.\n    \"\"\"\n    runner = CliRunner()\n\n    @click.command()\n    @click.option('--opt', default='default_val')\n    @click.argument('arg1', nargs=1)\n    @click.argument('arg2', nargs=-1)\n    def cli(opt, arg1, arg2):\n        \"\"\"Test command.\"\"\"\n        pass\n\n    # Get the completion items for the command\n    # This exercises the code at line 462 which deals with\n    # generating completion info for arguments/options\n    result = runner.invoke(cli, ['--help'])\n    assert result.exit_code == 0\n\n    # Now test the actual completion generation\n    # This directly calls the shell_completion code\n    comp = BashComplete(cli, {}, 'cli', '')\n    \n    # Set up environment variables needed for completion\n    os.environ['COMP_WORDS'] = 'cli'\n    os.environ['COMP_CWORD'] = '1'\n    \n    # Get completion for the first argument position\n    # This should trigger the code at line 462\n    items, _ = comp.get_completion_args()\n    \n    # The key assertion: verify that the completion items\n    # correctly reflect the argument structure\n    # For nargs=-1 argument, we expect it to be present\n    # and the completion should not crash or return wrong items\n    assert items is not None\n    assert isinstance(items, list)\n    \n    # Test with partial input that would exercise the argument parsing\n    # at line 462 - specifically testing how nargs and defaults interact\n    os.environ['COMP_WORDS'] = 'cli somearg'\n    os.environ['COMP_CWORD'] = '2'\n    items2, _ = comp.get_completion_args()\n    assert items2 is not None\n    assert isinstance(items2, list)\n    \n    # The critical check: verify that the completion for the option\n    # with a default value is correctly handled\n    # This is where line 462's logic would be sensitive to mutation\n    os.environ['COMP_WORDS'] = 'cli --opt '\n    os.environ['COMP_CWORD'] = '3'\n    items3, _ = comp.get_completion_args()\n    assert items3 is not None\n    assert isinstance(items3, list)\n    \n    # Verify that the completion items contain the expected structure\n    # This checks the observable behavior that would change if line 462\n    # was mutated (e.g., if the default value handling was broken)\n    for item in items3:\n        assert isinstance(item, CompletionItem)\n    \n    # Additional check: verify that the completion doesn't incorrectly\n    # suggest the default value as a completion for the option\n    # This is sensitive to mutations that might affect default value handling\n    option_completions = [i.value for i in items3 if i.value.startswith('--')]\n    assert '--opt' in option_completions\n    \n    # Clean up environment\n    del os.environ['COMP_WORDS']\n    del os.environ['COMP_CWORD']\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 10273,
+        "completion_tokens": 3599,
+        "total_tokens": 13872
+      }
+    },
+    {
+      "mutant_id": "e8cde621800c",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 490,
+      "operator": "ROR",
+      "description": "Equal → NotEqual",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import datetime\nfrom dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR\n\ndef test_kill_mutation_line_490():\n    # Test bysetpos with negative values and multiple weekdays\n    # This exercises the position calculation logic at line 490\n    rule = rrule(\n        DAILY,\n        dtstart=datetime(2020, 1, 1),\n        count=10,\n        byweekday=(MO, TU, WE, TH, FR),\n        bysetpos=-1  # last occurrence in each week\n    )\n    \n    occurrences = list(rule)\n    \n    # Expected: with bysetpos=-1 and weekdays Mon-Fri, we get the last\n    # weekday of each week (Friday) for the first two weeks\n    # Week 1: Jan 1-5 (Wed-Sun) -> weekdays are Jan 1(Wed),2(Thu),3(Fri)\n    # last is Jan 3\n    # Week 2: Jan 6-12 (Mon-Sun) -> weekdays are Jan 6-10\n    # last is Jan 10\n    # Week 3: Jan 13-19 -> last is Jan 17\n    # Week 4: Jan 20-26 -> last is Jan 24\n    # Week 5: Jan 27-31 -> last is Jan 31\n    # Week 6: Feb 3-9 -> last is Feb 7\n    # Week 7: Feb 10-16 -> last is Feb 14\n    # Week 8: Feb 17-23 -> last is Feb 21\n    # Week 9: Feb 24-29 -> last is Feb 28\n    # Week 10: Mar 2-8 -> last is Mar 6\n    expected = [\n        datetime(2020, 1, 3),\n        datetime(2020, 1, 10),\n        datetime(2020, 1, 17),\n        datetime(2020, 1, 24),\n        datetime(2020, 1, 31),\n        datetime(2020, 2, 7),\n        datetime(2020, 2, 14),\n        datetime(2020, 2, 21),\n        datetime(2020, 2, 28),\n        datetime(2020, 3, 6),\n    ]\n    \n    assert occurrences == expected\n    \n    # Test with bysetpos that exceeds the number of weekdays in a period\n    rule2 = rrule(\n        DAILY,\n        dtstart=datetime(2020, 1, 1),\n        count=3,\n        byweekday=(MO,),\n        bysetpos=2  # second Monday - but only one Monday per week\n    )\n    occurrences2 = list(rule2)\n    # Since there's only one Monday per week, bysetpos=2 should yield nothing\n    assert occurrences2 == []\n    \n    # Test with multiple bysetpos values\n    rule3 = rrule(\n        DAILY,\n        dtstart=datetime(2020, 1, 1),\n        count=4,\n        byweekday=(MO, TU, WE),\n        bysetpos=(1, -1)  # first and last of each week\n    )\n    occurrences3 = list(rule3)\n    # Week 1: Jan 1 (Wed) is the only weekday in that week (Jan 1-5)\n    # first=last=Jan 1\n    # Week 2: Jan 6-12 -> weekdays: Mon(6), Tue(7), Wed(8)\n    # first=Jan 6, last=Jan 8\n    # Week 3: Jan 13-19 -> weekdays: Mon(13), Tue(14), Wed(15)\n    # first=Jan 13, last=Jan 15\n    # Week 4: Jan 20-26 -> weekdays: Mon(20), Tue(21), Wed(22)\n    # first=Jan 20, last=Jan 22\n    # With count=4, we take first 4 occurrences: Jan 1, Jan 6, Jan 8, Jan 13\n    expected3 = [\n        datetime(2020, 1, 1),\n        datetime(2020, 1, 6),\n        datetime(2020, 1, 8),\n        datetime(2020, 1, 13),\n    ]\n    assert occurrences3 == expected3\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 13570,
+        "completion_tokens": 4870,
+        "total_tokens": 18440
+      }
+    },
+    {
+      "mutant_id": "40a5c3572975",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 923,
+      "operator": "AOR",
+      "description": "Add → Subtract",
+      "arm": "coverage",
+      "status": "killed",
+      "code": "import pytest\nfrom datetime import datetime\nfrom dateutil.rrule import rrule, WEEKLY, SU, MO\n\ndef test_kill_mutation_weekday_interval():\n    # Start on a Monday, but with wkst=SU and interval=2\n    # The rule should generate dates every 2 weeks on Sundays\n    start = datetime(2020, 1, 6)  # Monday\n    rule = rrule(WEEKLY, dtstart=start, wkst=SU, interval=2)\n    \n    # Get the first 5 occurrences\n    occurrences = list(rule[:5])\n    \n    # Expected: since wkst=SU and interval=2, the rule should\n    # generate dates on Sundays every 2 weeks starting from\n    # the first Sunday after the start date.\n    # First Sunday after Jan 6, 2020 is Jan 12, 2020\n    # Then every 2 weeks: Jan 26, Feb 9, Feb 23, Mar 8\n    expected = [\n        datetime(2020, 1, 6),   # Actually the first occurrence is the start date itself\n        datetime(2020, 1, 20),  # then every 2 weeks from start\n        datetime(2020, 2, 3),\n        datetime(2020, 2, 17),\n        datetime(2020, 3, 2),\n    ]\n    \n    assert occurrences == expected\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_rrule_L40a5c357.py",
+      "usage": {
+        "prompt_tokens": 1249,
+        "completion_tokens": 668,
+        "total_tokens": 1917
+      }
+    },
+    {
+      "mutant_id": "a5507d14019a",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 116,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import datetime\nfrom dateutil.relativedelta import relativedelta\n\ndef test_kill_mutation_line_116():\n    # Test the specific behavior at line 116 which handles invalid datetime objects\n    # The original code raises TypeError when the second argument is not a datetime\n    # A mutation might change the exception type or alter the validation logic\n    # Use a datetime-like object that is not actually a datetime instance\n    class FakeDateTime:\n        def __init__(self):\n            self.year = 2020\n            self.month = 1\n            self.day = 1\n            self.hour = 0\n            self.minute = 0\n            self.second = 0\n            self.microsecond = 0\n            self.tzinfo = None\n    \n    # The original code checks if the object is an instance of datetime\n    # A mutation might change this to check for hasattr or duck typing\n    # This test will fail if the mutation allows FakeDateTime to pass through\n    with pytest.raises(TypeError):\n        relativedelta(datetime(2020, 1, 1), FakeDateTime())\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 4855,
+        "completion_tokens": 850,
+        "total_tokens": 5705
+      }
+    },
+    {
+      "mutant_id": "9c4fcef142bd",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 234,
+      "operator": "AOR",
+      "description": "Multiply → Divide",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import datetime\nfrom dateutil.relativedelta import relativedelta\n\ndef test_kill_mutation_line234_fractional_overflow_precise():\n    # Target the exact overflow condition at line 234\n    # The existing tests cover fractional negative overflow and positive overflow2\n    # This test focuses on the boundary where fractional part causes integer carry\n    \n    # Case 1: Fractional seconds that cause carry to minutes\n    # When seconds=59.5, the fractional .5 should carry to make 60 seconds -> 1 minute\n    dt = datetime(2020, 1, 1, 0, 0, 59, 0)\n    rd = relativedelta(seconds=0.5)\n    result = dt + rd\n    # Expected: 59.5 seconds -> 59 seconds + 0.5 seconds = 59.5 seconds\n    # No carry to minutes because 59.5 < 60\n    assert result == datetime(2020, 1, 1, 0, 0, 59, 500000)\n    \n    # Case 2: Negative fractional seconds causing borrow from minutes\n    dt2 = datetime(2020, 1, 1, 0, 1, 0, 0)\n    rd2 = relativedelta(seconds=-0.5)\n    result2 = dt2 + rd2\n    # Expected: -0.5 seconds from 00:01:00 -> 00:00:59.500000\n    assert result2 == datetime(2020, 1, 1, 0, 0, 59, 500000)\n    \n    # Case 3: Fractional microseconds causing carry to seconds\n    dt3 = datetime(2020, 1, 1, 0, 0, 0, 999999)\n    rd3 = relativedelta(seconds=0.000001)  # 1 microsecond\n    result3 = dt3 + rd3\n    # Expected: 999999 + 1 = 1000000 microseconds -> carry to 1 second\n    assert result3 == datetime(2020, 1, 1, 0, 0, 1, 0)\n    \n    # Case 4: Negative fractional seconds with borrow from hours\n    dt4 = datetime(2020, 1, 1, 1, 0, 0, 0)\n    rd4 = relativedelta(seconds=-0.5)\n    result4 = dt4 + rd4\n    # Expected: 1:00:00 - 0.5s = 0:59:59.500000\n    assert result4 == datetime(2020, 1, 1, 0, 59, 59, 500000)\n    \n    # Case 5: Combined fractional and integer parts\n    dt5 = datetime(2020, 1, 1, 0, 0, 0, 0)\n    rd5 = relativedelta(seconds=1.5, microseconds=500000)  # total 2.0 seconds\n    result5 = dt5 + rd5\n    # Expected: 1.5s + 0.5s = 2.0s -> 00:00:02\n    assert result5 == datetime(2020, 1, 1, 0, 0, 2, 0)\n    \n    # Case 6: Negative combined fractional\n    dt6 = datetime(2020, 1, 1, 0, 0, 2, 0)\n    rd6 = relativedelta(seconds=-1.5, microseconds=-500000)  # total -2.0 seconds\n    result6 = dt6 + rd6\n    # Expected: 2.0s - 2.0s = 0 -> 00:00:00\n    assert result6 == datetime(2020, 1, 1, 0, 0, 0, 0)\n    \n    # Case 7: Critical edge - fractional seconds with exact .5 that causes rounding\n    # This is the key case that might be affected by the mutation\n    dt7 = datetime(2020, 1, 1, 0, 0, 0, 0)\n    rd7 = relativedelta(seconds=0.5)\n    result7 = dt7 + rd7\n    # Expected: 0.5 seconds -> 0 seconds + 500000 microseconds\n    assert result7 == datetime(2020, 1, 1, 0, 0, 0, 500000)\n    \n    # Case 8: Negative .5 seconds\n    dt8 = datetime(2020, 1, 1, 0, 0, 0, 0)\n    rd8 = relativedelta(seconds=-0.5)\n    result8 = dt8 + rd8\n    # Expected: -0.5 seconds -> 23:59:59.500000 (previous day)\n    assert result8 == datetime(2019, 12, 31, 23, 59, 59, 500000)\n    \n    # Case 9: Fractional seconds with large integer part\n    dt9 = datetime(2020, 1, 1, 0, 0, 0, 0)\n    rd9 = relativedelta(seconds=3600.5)  # 1 hour + 0.5 seconds\n    result9 = dt9 + rd9\n    # Expected: 1:00:00.500000\n    assert result9 == datetime(2020, 1, 1, 1, 0, 0, 500000)\n    \n    # Case 10: Negative fractional with large integer part\n    dt10 = datetime(2020, 1, 1, 1, 0, 0, 0)\n    rd10 = relativedelta(seconds=-3600.5)  # -1 hour - 0.5 seconds\n    result10 = dt10 + rd10\n    # Expected: 23:59:59.500000 (previous day)\n    assert result10 == datetime(2019, 12, 31, 23, 59, 59, 500000)\n    \n    # Case 11: Very precise fractional seconds that might expose rounding differences\n    dt11 = datetime(2020, 1, 1, 0, 0, 0, 0)\n    rd11 = relativedelta(seconds=0.333333)  # 1/3 second\n    result11 = dt11 + rd11\n    # Expected: 0.333333 seconds -> 333333 microseconds\n    assert result11 == datetime(2020, 1, 1, 0, 0, 0, 333333)\n    \n    # Case 12: Negative very precise fractional\n    dt12 = datetime(2020, 1, 1, 0, 0, 0, 0)\n    rd12 = relativedelta(seconds=-0.333333)\n    result12 = dt12 + rd12\n    # Expected: -0.333333 seconds -> 23:59:59.666667 (previous day)\n    assert result12 == datetime(2019, 12, 31, 23, 59, 59, 666667)\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 15442,
+        "completion_tokens": 5202,
+        "total_tokens": 20644
+      }
+    },
+    {
+      "mutant_id": "ffc59e202f2e",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 135,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom dateutil.tz.win import tzwin\nfrom datetime import datetime, timedelta\n\ndef test_kill_mutation_135():\n    # Get a real Windows timezone entry\n    tz = tzwin(\"Eastern Standard Time\")\n    \n    # Test the exact string representation of the timezone\n    # The mutation at line 135 likely affects the internal name or key\n    # that is used in the repr/str output\n    expected_repr = \"tzwin('Eastern Standard Time')\"\n    assert repr(tz) == expected_repr\n    \n    # Also test that the timezone produces correct UTC offset for a known date\n    # This exercises the internal logic that line 135 might affect\n    dt = datetime(2020, 1, 15, 12, 0, 0)\n    offset = tz.utcoffset(dt)\n    assert offset is not None\n    assert offset.total_seconds() == -5 * 3600  # EST is UTC-5\n    \n    # Test equality with another tzwin instance of the same name\n    tz2 = tzwin(\"Eastern Standard Time\")\n    assert tz == tz2\n    \n    # Test inequality with a different timezone\n    tz3 = tzwin(\"Pacific Standard Time\")\n    assert tz != tz3\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6233,
+        "completion_tokens": 1148,
+        "total_tokens": 7381
+      }
+    },
+    {
+      "mutant_id": "31ed87866fa4",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 341,
+      "operator": "ROR",
+      "description": "NotEqual → Equal",
+      "arm": "coverage",
+      "status": "killed",
+      "code": "import pytest\nfrom datetime import datetime, timedelta\nfrom dateutil.tz.win import tzwin\n\nclass TestKillMutation341:\n    def test_kill_mutation_341(self):\n        # Create a timezone with a positive UTC offset\n        tz = tzwin(\"GMT Standard Time\")\n        \n        # Get the UTC offset for a date in the summer (when DST is active)\n        summer_date = datetime(2020, 7, 1, 12, 0, 0)\n        summer_offset = tz.utcoffset(summer_date)\n        \n        # Get the UTC offset for a date in the winter (when DST is not active)\n        winter_date = datetime(2020, 1, 1, 12, 0, 0)\n        winter_offset = tz.utcoffset(winter_date)\n        \n        # The offsets should be different (DST transition)\n        assert summer_offset != winter_offset\n        \n        # Verify the offsets are correct for this timezone\n        # GMT Standard Time is UTC+0 in winter, UTC+1 in summer\n        assert winter_offset == timedelta(0)\n        assert summer_offset == timedelta(hours=1)\n        \n        # Now test the fold behavior - this is what line 341 likely handles\n        # Create a datetime that falls in the ambiguous period (fall back)\n        # For 2020, DST ends on October 25 at 2:00 AM local time\n        # So 1:30 AM on October 25, 2020 is ambiguous\n        ambiguous_time = datetime(2020, 10, 25, 1, 30, 0)\n        \n        # The fold attribute should affect the UTC offset\n        # fold=0 means first occurrence (before the transition)\n        # fold=1 means second occurrence (after the transition)\n        offset_fold0 = tz.utcoffset(ambiguous_time.replace(fold=0))\n        offset_fold1 = tz.utcoffset(ambiguous_time.replace(fold=1))\n        \n        # These should be different because the fold determines which side of the transition\n        assert offset_fold0 != offset_fold1\n        \n        # Verify the specific values\n        # Before transition (fold=0): still in DST, so UTC+1\n        assert offset_fold0 == timedelta(hours=1)\n        # After transition (fold=1): back to standard time, so UTC+0\n        assert offset_fold1 == timedelta(0)\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_win_L31ed8786.py",
+      "usage": {
+        "prompt_tokens": 1636,
+        "completion_tokens": 1084,
+        "total_tokens": 2720
+      }
+    },
+    {
+      "mutant_id": "0c371d2eed6e",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 777,
+      "operator": "CR",
+      "description": "0 → 1",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2 import Environment\nfrom jinja2.nodes import CallBlock\n\ndef test_mutation_kill_nodes_777():\n    \"\"\"Test that exercises the behavior at nodes.py line 777.\"\"\"\n    env = Environment()\n    \n    # This test targets the behavior around line 777 which is related to\n    # how CallBlock nodes handle their content/arguments\n    source = \"\"\"\n    {% macro render() %}\n        <div>{{ caller() }}</div>\n    {% endmacro %}\n    {% call render() %}Hello World{% endcall %}\n    \"\"\"\n    \n    template = env.from_string(source)\n    result = template.render()\n    \n    # The key assertion - if the mutation changed how CallBlock processes\n    # its body or arguments, this would fail\n    assert result.strip() == \"<div>Hello World</div>\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6280,
+        "completion_tokens": 880,
+        "total_tokens": 7160
+      }
+    },
+    {
+      "mutant_id": "436346ef7913",
+      "project": "jinja",
+      "module": "environment.py",
+      "line": 1657,
+      "operator": "ROR",
+      "description": "LessThanEqual → LessThan",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "from jinja2 import Environment\nfrom jinja2.environment import Template\n\ndef test_kill_mutation_at_line_1657():\n    env = Environment()\n    \n    # Line 1657 is in the _stream method's buffering logic\n    # The mutation likely affects how the buffer is initialized or flushed\n    # Test with a template that produces output in chunks and check exact chunk boundaries\n    \n    # Create a template that yields output in a way that depends on buffer size\n    template = env.from_string(\"{% for i in range(5) %}{{ i }}{% if i < 4 %}|{% endif %}{% endfor %}\")\n    \n    # Test 1: Normal streaming should produce complete output\n    stream = template.stream()\n    chunks = list(stream)\n    # The mutation might cause incomplete chunks or wrong concatenation\n    assert ''.join(chunks) == \"0|1|2|3|4\"\n    \n    # Test 2: Check that each chunk is non-empty and the total is correct\n    # This catches mutations that might drop content or duplicate it\n    total = ''\n    for chunk in template.stream():\n        assert chunk != ''  # No empty chunks should be produced\n        total += chunk\n    assert total == \"0|1|2|3|4\"\n    \n    # Test 3: Test with a template that has a conditional that depends on buffer state\n    # This is more sensitive to internal buffer management\n    t2 = env.from_string(\"{% set ns = namespace(count=0) %}{% for i in range(3) %}{% set ns.count = ns.count + 1 %}{{ ns.count }}{% endfor %}\")\n    \n    # The mutation might affect when the namespace is updated relative to output\n    result = t2.render()\n    assert result == \"123\"\n    \n    # Test 4: Test with whitespace control that might interact with buffering\n    t3 = env.from_string(\"  {%- for i in range(2) -%}\\n{{ i }}\\n{%- endfor -%}  \")\n    result3 = t3.render()\n    assert result3 == \"01\"\n    \n    # Test 5: Test with a very small buffer threshold by using many small outputs\n    # This forces the buffer to flush multiple times\n    t4 = env.from_string(\"{% for i in range(100) %}{{ i }}{% endfor %}\")\n    result4 = ''.join(t4.stream())\n    expected4 = ''.join(str(i) for i in range(100))\n    assert result4 == expected4\n    \n    # Test 6: Test with a template that uses a custom filter that returns a string\n    # This exercises the buffering in a different way\n    def custom_filter(value):\n        return f\"[{value}]\"\n    env.filters['custom'] = custom_filter\n    \n    t5 = env.from_string(\"{{ 'test'|custom }}\")\n    result5 = ''.join(t5.stream())\n    assert result5 == \"[test]\"\n    \n    # Test 7: Test with a template that has both static and dynamic content\n    # This checks that the buffer correctly handles mixed content\n    t6 = env.from_string(\"Static {{ value }} More {{ other }}\")\n    result6 = ''.join(t6.stream(value=\"A\", other=\"B\"))\n    assert result6 == \"Static A More B\"\n    \n    # Test 8: Test with a template that produces output in a loop with a condition\n    # This checks that the buffer is properly flushed at the right times\n    t7 = env.from_string(\"{% for i in range(10) %}{% if i % 2 == 0 %}even{% else %}odd{% endif %}{% endfor %}\")\n    result7 = ''.join(t7.stream())\n    assert result7 == \"evenoddevenoddevenoddevenoddevenodd\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 10205,
+        "completion_tokens": 2922,
+        "total_tokens": 13127
+      }
+    },
+    {
+      "mutant_id": "0bf228106e99",
+      "project": "jinja",
+      "module": "environment.py",
+      "line": 857,
+      "operator": "AOR",
+      "description": "LeftShift → RightShift",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2 import Environment, DictLoader, ChoiceLoader, PrefixLoader, FileSystemLoader\nfrom jinja2.environment import Environment as Env\nfrom jinja2.exceptions import TemplateNotFound\nimport pathlib\nimport tempfile\nimport os\n\ndef test_mutation_857_loader_behavior():\n    \"\"\"Targeted test for line 857 mutation in environment.py\"\"\"\n    \n    # Test 1: PrefixLoader with non-matching prefix should raise TemplateNotFound\n    loader = PrefixLoader({\n        'a': DictLoader({'x.html': 'A'}),\n        'b': DictLoader({'y.html': 'B'})\n    })\n    env = Environment(loader=loader)\n    \n    # This is the critical assertion - if mutation changes error handling\n    # for missing prefixes, this will fail\n    with pytest.raises(TemplateNotFound):\n        env.get_template('c/x.html')\n    \n    # Test 2: ChoiceLoader fallback behavior\n    choice_loader = ChoiceLoader([\n        DictLoader({}),\n        DictLoader({'test.html': 'content'})\n    ])\n    env2 = Environment(loader=choice_loader)\n    template = env2.get_template('test.html')\n    assert template.render() == 'content'\n    \n    # Test 3: FileSystemLoader with pathlib.Path\n    with tempfile.TemporaryDirectory() as tmpdir:\n        p = pathlib.Path(tmpdir) / 'test.html'\n        p.write_text('hello')\n        fs_loader = FileSystemLoader(tmpdir)\n        env3 = Environment(loader=fs_loader)\n        template = env3.get_template('test.html')\n        assert template.render() == 'hello'\n    \n    # Test 4: Multiple paths including pathlib\n    with tempfile.TemporaryDirectory() as tmpdir2:\n        p2 = pathlib.Path(tmpdir2) / 'other.html'\n        p2.write_text('other')\n        env4 = Environment(loader=FileSystemLoader([tmpdir, pathlib.Path(tmpdir2)]))\n        template = env4.get_template('other.html')\n        assert template.render() == 'other'\n    \n    # Test 5: Weak reference behavior\n    import weakref\n    env5 = Environment(loader=DictLoader({'w.html': 'weak'}))\n    template = env5.get_template('w.html')\n    ref = weakref.ref(template)\n    assert ref() is not None\n    \n    # Test 6: Logging behavior\n    import logging\n    log_messages = []\n    class CaptureHandler(logging.Handler):\n        def emit(self, record):\n            log_messages.append(record.getMessage())\n    \n    logger = logging.getLogger('jinja2')\n    handler = CaptureHandler()\n    logger.addHandler(handler)\n    try:\n        env6 = Environment(loader=DictLoader({'log.html': 'log'}))\n        env6.get_template('log.html')\n    finally:\n        logger.removeHandler(handler)\n    \n    # Test 7: Zip file loading\n    import zipfile\n    import io\n    zip_buffer = io.BytesIO()\n    with zipfile.ZipFile(zip_buffer, 'w') as zf:\n        zf.writestr('zip_template.html', 'zip content')\n    zip_buffer.seek(0)\n    \n    with tempfile.NamedTemporaryFile(suffix='.zip', delete=False) as f:\n        f.write(zip_buffer.getvalue())\n        zip_path = f.name\n    \n    try:\n        from jinja2.loaders import FileSystemLoader as FSL\n        env7 = Environment(loader=FSL(zip_path))\n        # This might not work directly, but we're testing the loader mechanism\n        # The key is that the loader should handle the path correctly\n        assert env7.loader is not None\n    finally:\n        os.unlink(zip_path)\n    \n    # Test 8: Edge case - empty loader list\n    env8 = Environment(loader=ChoiceLoader([]))\n    with pytest.raises(TemplateNotFound):\n        env8.get_template('nonexistent.html')\n    \n    # Test 9: Edge case - ChoiceLoader where all loaders fail\n    choice_loader9 = ChoiceLoader([\n        DictLoader({}),\n        DictLoader({})\n    ])\n    env9 = Environment(loader=choice_loader9)\n    with pytest.raises(TemplateNotFound):\n        env9.get_template('missing.html')\n    \n    # Test 10: Edge case - FileSystemLoader with non-existent directory\n    fs_loader10 = FileSystemLoader('/nonexistent/path')\n    env10 = Environment(loader=fs_loader10)\n    with pytest.raises(TemplateNotFound):\n        env10.get_template('test.html')\n    \n    # Test 11: Edge case - pathlib.Path that doesn't exist\n    p11 = pathlib.Path('/nonexistent/path')\n    fs_loader11 = FileSystemLoader(p11)\n    env11 = Environment(loader=fs_loader11)\n    with pytest.raises(TemplateNotFound):\n        env11.get_template('test.html')\n    \n    # Test 12: Mixed valid and invalid paths\n    with tempfile.TemporaryDirectory() as tmpdir12:\n        valid_path = pathlib.Path(tmpdir12) / 'valid'\n        valid_path.mkdir()\n        (valid_path / 'test.html').write_text('content')\n        \n        fs_loader12 = FileSystemLoader([valid_path, '/nonexistent'])\n        env12 = Environment(loader=fs_loader12)\n        template = env12.get_template('test.html')\n        assert template.render() == 'content'\n    \n    # Test 13: Template name with special characters\n    env13 = Environment(loader=DictLoader({'a/b.html': 'slash'}))\n    template = env13.get_template('a/b.html')\n    assert template.render() == 'slash'\n    \n    # Test 14: Template name with dots\n    env14 = Environment(loader=DictLoader({'a.b.html': 'dot'}))\n    template = env14.get_template('a.b.html')\n    assert template.render() == 'dot'\n    \n    # Test 15: Template name with backslashes\n    env15 = Environment(loader=DictLoader({'a\\\\b.html': 'backslash'}))\n    template = env15.get_template('a\\\\b.html')\n    assert template.render() == 'backslash'\n    \n    # Test 16: Empty template name\n    env16 = Environment(loader=DictLoader({'': 'empty'}))\n    template = env16.get_template('')\n    assert template.render() == 'empty'\n    \n    # Test 17: None template name\n    env17 = Environment(loader=DictLoader({'None': 'none'}))\n    with pytest.raises(TemplateNotFound):\n        env17.get_template(None)\n    \n    # Test 18: Non-string template name\n    env18 = Environment(loader=DictLoader({'123': 'number'}))\n    with pytest.raises(TemplateNotFound):\n        env18.get_template(123)\n    \n    # Test 19: pathlib.Path as template name - should be converted to string\n    env19 = Environment(loader=DictLoader({'path.html': 'path'}))\n    template = env19.get_template(str(pathlib.Path('path.html')))\n    assert template.render() == 'path'\n    \n    # Test 20: bytes template name\n    env20 = Environment(loader=DictLoader({'bytes.html': 'bytes'}))\n    with pytest.raises(TemplateNotFound):\n        env20.get_template(b'bytes.html')\n    \n    # Test 21: Template name with whitespace\n    env21 = Environment(loader=DictLoader({'  spaced.html  ': 'spaced'}))\n    template = env21.get_template('  spaced.html  ')\n    assert template.render() == 'spaced'\n    \n    # Test 22: Unicode template name\n    env22 = Environment(loader=DictLoader({'café.html': 'unicode'}))\n    template = env22.get_template('café.html')\n    assert template.render() == 'unicode'\n    \n    # Test 23: Very long template name\n    long_name = 'a' * 1000 + '.html'\n    env23 = Environment(loader=DictLoader({long_name: 'long'}))\n    template = env23.get_template(long_name)\n    assert template.render() == 'long'\n    \n    # Test 24: Null bytes in template name\n    env24 = Environment(loader=DictLoader({'null\\x00.html': 'null'}))\n    with pytest.raises(TemplateNotFound):\n        env24.get_template('null\\x00.html')\n    \n    # Test 25: Path traversal\n    env25 = Environment(loader=DictLoader({'../secret.html': 'secret'}))\n    with pytest.raises(TemplateNotFound):\n        env25.get_template('../secret.html')\n    \n    # Test 26: Absolute path\n    env26 = Environment(loader=DictLoader({'/etc/passwd': 'passwd'}))\n    with pytest.raises(TemplateNotFound):\n        env26.get_template('/etc/passwd')\n    \n    # Test 27: URL as template name\n    env27 = Environment(loader=DictLoader({'http://example.com': 'url'}))\n    with pytest.raises(TemplateNotFound):\n        env27.get_template('http://example.com')\n    \n    # Test 28: Query string in template name\n    env28 = Environment(loader=DictLoader({'test.html?query=1': 'query'}))\n    with pytest.raises(TemplateNotFound):\n        env28.get_template('test.html?query=1')\n    \n    # Test 29: Fragment in template name\n    env29 = Environment(loader=DictLoader({'test.html#fragment': 'fragment'}))\n    with pytest.raises(TemplateNotFound):\n        env29.get_template('test.html#fragment')\n    \n    # Test 30: Both query and fragment\n    env30 = Environment(loader=DictLoader({'test.html?query=1#fragment': 'both'}))\n    with pytest.raises(TemplateNotFound):\n        env30.get_template('test.html?query=1#fragment')\n    \n    # Test 31: Spaces in path\n    env31 = Environment(loader=DictLoader({'path with spaces.html': 'spaces'}))\n    template = env31.get_template('path with spaces.html')\n    assert template.render() == 'spaces'\n    \n    # Test 32: Special regex characters\n    env32 = Environment(loader=DictLoader({'a+b*c?.html': 'regex'}))\n    template = env32.get_template('a+b*c?.html')\n    assert template.render() == 'regex'\n    \n    # Test 33: Brackets in template name\n    env33 = Environment(loader=DictLoader({'a[b]c.html': 'brackets'}))\n    template = env33.get_template('a[b]c.html')\n    assert template.render() == 'brackets'\n    \n    # Test 34: Braces in template name\n    env34 = Environment(loader=DictLoader({'a{b}c.html': 'braces'}))\n    template = env34.get_template('a{b}c.html')\n    assert template.render() == 'braces'\n    \n    # Test 35: Parentheses in template name\n    env35 = Environment(loader=DictLoader({'a(b)c.html': 'parens'}))\n    template = env35.get_template('a(b)c.html')\n    assert template.render() == 'parens'\n    \n    # Test 36: Dollar signs in template name\n    env36 = Environment(loader=DictLoader({'a$b.html': 'dollar'}))\n    template = env36.get_template('a$b.html')\n    assert template.render() == 'dollar'\n    \n    # Test 37: Caret in template name\n    env37 = Environment(loader=DictLoader({'a^b.html': 'caret'}))\n    template = env37.get_template('a^b.html')\n    assert template.render() == 'caret'\n    \n    # Test 38: Pipe in template name\n    env38 = Environment(loader=DictLoader({'a|b.html': 'pipe'}))\n    template = env38.get_template('a|b.html')\n    assert template.render() == 'pipe'\n    \n    # Test 39: Ampersand in template name\n    env39 = Environment(loader=DictLoader({'a&b.html': 'amp'}))\n    template = env39.get_template('a&b.html')\n    assert template.render() == 'amp'\n    \n    # Test 40: Semicolon in template name\n    env40 = Environment(loader=DictLoader({'a;b.html': 'semicolon'}))\n    template = env40.get_template('a;b.html')\n    assert template.render() == 'semicolon'\n    \n    # Test 41: Colon in template name\n    env41 = Environment(loader=DictLoader({'a:b.html': 'colon'}))\n    template = env41.get_template('a:b.html')\n    assert template.render() == 'colon'\n    \n    # Test 42: Comma in template name\n    env42 = Environment(loader=DictLoader({'a,b.html': 'comma'}))\n    template = env42.get_template('a,b.html')\n    assert template.render() == 'comma'\n    \n    # Test 43: Equals sign in template name\n    env43 = Environment(loader=DictLoader({'a=b.html': 'equals'}))\n    template = env43.get_template('a=b.html')\n    assert template.render() == 'equals'\n    \n    # Test 44: Plus sign in template name\n    env44 = Environment(loader=DictLoader({'a+b.html': 'plus'}))\n    template = env44.get_template('a+b.html')\n    assert template.render() == 'plus'\n",
+      "rounds": 5,
+      "tautological_rounds": 1,
+      "usage": {
+        "prompt_tokens": 37870,
+        "completion_tokens": 15897,
+        "total_tokens": 53767
+      }
+    },
+    {
+      "mutant_id": "85f49894fca4",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 200,
+      "operator": "COR",
+      "description": "Or → And",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import datetime\nimport pytest\nfrom marshmallow.utils import from_timestamp\n\ndef test_kill_mutation_from_timestamp_edge_case():\n    # Test with a timestamp that is a float with high precision\n    # This targets the specific behavior at line 200 in utils.py\n    result = from_timestamp(1384043025.123456)\n    assert result == datetime.datetime(2013, 11, 10, 0, 23, 45, 123456)\n    # Additional assertion to check the exact microsecond value\n    assert result.microsecond == 123456\n    # Check that the result is not rounded or truncated\n    assert result.second == 45\n    assert result.minute == 23\n    assert result.hour == 0\n    assert result.day == 10\n    assert result.month == 11\n    assert result.year == 2013\n    # Check that the result is a datetime object with tzinfo\n    assert result.tzinfo is not None\n    # Check the exact UTC offset\n    assert result.utcoffset() == datetime.timedelta(0)\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 7537,
+        "completion_tokens": 739,
+        "total_tokens": 8276
+      }
+    },
+    {
+      "mutant_id": "c4ca4fea7609",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 167,
+      "operator": "AOR",
+      "description": "Add → Subtract",
+      "arm": "coverage",
+      "status": "killed",
+      "code": "import pytest\nfrom datetime import datetime, timezone, timedelta\nfrom marshmallow.utils import from_iso_datetime\n\ndef test_kill_mutation_iso_datetime_with_positive_offset_and_microseconds():\n    # Test with positive timezone offset and microseconds\n    # This targets the parsing logic around line 167 which handles\n    # the timezone offset sign and microseconds conversion\n    input_str = \"2013-11-10T01:23:45.123456+05:30\"\n    expected = datetime(2013, 11, 10, 1, 23, 45, 123456, tzinfo=timezone(timedelta(hours=5, minutes=30)))\n    \n    result = from_iso_datetime(input_str)\n    \n    assert result == expected\n    assert result.tzinfo is not None\n    assert result.tzinfo.utcoffset(result) == timedelta(hours=5, minutes=30)\n    assert result.microsecond == 123456\n    assert result.hour == 1\n    assert result.minute == 23\n    assert result.second == 45\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_utils_Lc4ca4fea.py",
+      "usage": {
+        "prompt_tokens": 2476,
+        "completion_tokens": 459,
+        "total_tokens": 2935
+      }
+    },
+    {
+      "mutant_id": "f85007480a02",
+      "project": "marshmallow",
+      "module": "validate.py",
+      "line": 137,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.validate import URL\n\ndef test_url_field_requre_tld_false_mutation():\n    # 测试 require_tld=False 时，URL 验证器对无 TLD URL 的处理\n    validator = URL(require_tld=False)\n    \n    # 无 TLD 的 URL 在 require_tld=False 时应该通过\n    valid_url = \"http://localhost:8000/path\"\n    assert validator(valid_url) == valid_url\n    \n    # 带 TLD 的 URL 也应该通过\n    valid_tld_url = \"http://example.com/path\"\n    assert validator(valid_tld_url) == valid_tld_url\n    \n    # 测试 require_tld=True 时的行为（如果变异影响了默认值或处理逻辑）\n    validator_strict = URL(require_tld=True)\n    # 无 TLD 的 URL 在 require_tld=True 时应该失败\n    with pytest.raises(ValidationError):\n        validator_strict(valid_url)\n    \n    # 带 TLD 的 URL 在 require_tld=True 时应该通过\n    assert validator_strict(valid_tld_url) == valid_tld_url\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 5975,
+        "completion_tokens": 1301,
+        "total_tokens": 7276
+      }
+    },
+    {
+      "mutant_id": "64d08d707ccf",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 221,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.schema import Schema\n\n\nclass TestSchemaAdditionalOption:\n    def test_additional_option_accepts_tuple(self):\n        class MySchema(Schema):\n            class Meta:\n                additional = (\"field1\", \"field2\")\n\n        schema = MySchema()\n        assert schema.opts.additional == (\"field1\", \"field2\")\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 4792,
+        "completion_tokens": 473,
+        "total_tokens": 5265
+      }
+    },
+    {
+      "mutant_id": "8469bddc0372",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 1090,
+      "operator": "ROR",
+      "description": "GreaterThan → GreaterThanEqual",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow import Schema, fields\nfrom marshmallow.schema import Schema as SchemaClass\n\nclass ValidSchema(SchemaClass):\n    data_key_field = fields.String(data_key=\"custom_name\")\n    other_field = fields.String()\n\ndef test_data_key_collision_kill_mutation():\n    # Test that duplicate data_keys are properly detected\n    # This should fail if the mutation removes/changes the collision detection\n    with pytest.raises(Exception) as exc_info:\n        class DuplicateKeySchema(SchemaClass):\n            field1 = fields.String(data_key=\"same_key\")\n            field2 = fields.String(data_key=\"same_key\")\n    \n    # Verify the error message mentions the collision\n    assert \"same_key\" in str(exc_info.value)\n    \n    # Also test that valid schemas without collisions still work\n    valid_schema = ValidSchema()\n    result = valid_schema.load({\"custom_name\": \"value1\", \"other_field\": \"value2\"})\n    assert result == {\"data_key_field\": \"value1\", \"other_field\": \"value2\"}\n    \n    # Test serialization with data_key\n    serialized = valid_schema.dump({\"data_key_field\": \"value1\", \"other_field\": \"value2\"})\n    assert serialized == {\"custom_name\": \"value1\", \"other_field\": \"value2\"}\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6770,
+        "completion_tokens": 1482,
+        "total_tokens": 8252
+      }
+    },
+    {
+      "mutant_id": "8607eccf3b2d",
+      "project": "click",
+      "module": "types.py",
+      "line": 391,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.types import DateTime\nfrom click.exceptions import BadParameter\n\ndef test_datetime_option_default_kill_mutation():\n    \"\"\"Test that DateTime type correctly parses ISO format datetime strings.\"\"\"\n    dt_type = DateTime()\n    \n    # Test with a standard ISO format datetime string\n    result = dt_type.convert(\"2024-01-15T10:30:00\", None, None)\n    assert result.year == 2024\n    assert result.month == 1\n    assert result.day == 15\n    assert result.hour == 10\n    assert result.minute == 30\n    assert result.second == 0\n    \n    # Test with a datetime string that has a space separator\n    result_space = dt_type.convert(\"2024-01-15 10:30:00\", None, None)\n    assert result_space.year == 2024\n    assert result_space.month == 1\n    assert result_space.day == 15\n    assert result_space.hour == 10\n    assert result_space.minute == 30\n    assert result_space.second == 0\n    \n    # Test with a datetime string that has a different timezone format (UTC offset)\n    # This should fail because the formats don't include timezone info\n    with pytest.raises(BadParameter):\n        dt_type.convert(\"2024-01-15T10:30:00+00:00\", None, None)\n    \n    # Test with an invalid datetime string\n    with pytest.raises(BadParameter):\n        dt_type.convert(\"not-a-datetime\", None, None)\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 7211,
+        "completion_tokens": 1650,
+        "total_tokens": 8861
+      }
+    },
+    {
+      "mutant_id": "9778edb8a887",
+      "project": "click",
+      "module": "types.py",
+      "line": 923,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.types import Path\n\ndef test_path_surrogates_encoding_error_handling():\n    \"\"\"Test that Path type raises an error when encoding fails for surrogate paths.\"\"\"\n    path_type = Path(exists=False, file_okay=True, dir_okay=True)\n    \n    # Use a surrogate that will cause an encoding error when the path is processed\n    # The original code likely raises a UnicodeEncodeError or similar\n    # A mutation might silently pass or change the error type\n    value = \"test_\\udcff_file.txt\"\n    \n    # Try to encode the path to bytes - this should fail with a surrogate\n    # The original code likely handles this by raising a click error\n    with pytest.raises(Exception) as excinfo:\n        # Force the path to be encoded to bytes (which is what happens internally)\n        path_type.convert(value, None, None)\n        # If no exception, try to encode manually to trigger the error\n        value.encode('utf-8')\n    \n    # The error should be a UnicodeEncodeError or a click error wrapping it\n    assert isinstance(excinfo.value, (UnicodeEncodeError, Exception))\n    assert \"surrogate\" in str(excinfo.value).lower() or \"encode\" in str(excinfo.value).lower()\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6153,
+        "completion_tokens": 1084,
+        "total_tokens": 7237
+      }
+    },
+    {
+      "mutant_id": "3544586c0528",
+      "project": "click",
+      "module": "parser.py",
+      "line": 473,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nimport click\nfrom click.parser import OptionParser\nfrom click.testing import CliRunner\nfrom click import Command, Option, Context\n\n\ndef test_mutation_parser_line_473():\n    \"\"\"Kill mutation at parser.py:473 by testing option parsing with nargs=2 and missing argument.\"\"\"\n    @click.command()\n    @click.option('--pair', nargs=2, type=str)\n    def cli(pair):\n        click.echo(f\"{pair[0]}:{pair[1]}\")\n\n    runner = CliRunner()\n    # This should fail because --pair requires 2 arguments but only 1 is provided\n    result = runner.invoke(cli, ['--pair', 'only_one'])\n    assert result.exit_code != 0\n    assert 'requires 2 arguments' in result.output or 'requires an argument' in result.output\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6641,
+        "completion_tokens": 937,
+        "total_tokens": 7578
+      }
+    },
+    {
+      "mutant_id": "6ce715a7c280",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 541,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nimport click\nfrom click.shell_completion import CompletionItem\nfrom click.shell_completion import ShellComplete\nfrom click.testing import CliRunner\n\n\nclass CustomShellComplete(ShellComplete):\n    name = \"custom\"\n    def source(self):\n        return []\n\n\ndef test_chained_mutation_kill():\n    \"\"\"Test that chained completion items are correctly processed.\"\"\"\n    runner = CliRunner()\n\n    @click.group()\n    def cli():\n        pass\n\n    @cli.command()\n    @click.option(\"--opt\", type=str)\n    def cmd(opt):\n        pass\n\n    # Create a shell completion instance\n    shell = CustomShellComplete(cli, \"test_prog\", \"_TEST_COMPLETE\")\n\n    # Test the completion for a chained command scenario\n    # This exercises line 541 which handles chained completion items\n    result = shell.get_completions([\"cmd\", \"--opt\", \"\"], incomplete=\"\")\n\n    # The key behavior: when incomplete is empty and we have a chained context,\n    # the completion should return the option completions\n    assert any(isinstance(item, CompletionItem) for item in result)\n    assert any(item.value == \"--opt\" for item in result)\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 5889,
+        "completion_tokens": 1296,
+        "total_tokens": 7185
+      }
+    },
+    {
+      "mutant_id": "e8cde621800c",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 490,
+      "operator": "ROR",
+      "description": "Equal → NotEqual",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import datetime\nfrom dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR\n\ndef test_kill_mutation_line_490():\n    # The original testBadBySetPos covers line 490, which likely handles\n    # bysetpos with negative indices or edge cases. Let's test a scenario\n    # where bysetpos selects from a set that includes multiple weekdays\n    # but with a count that spans multiple weeks, ensuring the selection\n    # logic is correct.\n    \n    # Start on a Monday, 2023-01-02\n    start = datetime(2023, 1, 2)\n    \n    # Rule: daily, but only on weekdays (Mon-Fri), and select the 2nd\n    # occurrence from each set of weekdays in a week.\n    # This exercises bysetpos with a multi-day byweekday.\n    rule = rrule(\n        DAILY,\n        dtstart=start,\n        byweekday=(MO, TU, WE, TH, FR),\n        bysetpos=2,\n        count=5\n    )\n    \n    # Expected results: For each week, the set is [Mon, Tue, Wed, Thu, Fri],\n    # and bysetpos=2 selects Tuesday. So we expect:\n    # 2023-01-03 (Tue), 2023-01-10 (Tue), 2023-01-17 (Tue),\n    # 2023-01-24 (Tue), 2023-01-31 (Tue)\n    expected = [\n        datetime(2023, 1, 3),\n        datetime(2023, 1, 10),\n        datetime(2023, 1, 17),\n        datetime(2023, 1, 24),\n        datetime(2023, 1, 31),\n    ]\n    \n    result = list(rule)\n    assert result == expected, f\"Expected {expected}, got {result}\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 8929,
+        "completion_tokens": 2151,
+        "total_tokens": 11080
+      }
+    },
+    {
+      "mutant_id": "0e9a7bbfd0a1",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 1202,
+      "operator": "AOR",
+      "description": "Subtract → Add",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import datetime\nfrom dateutil.rrule import rrule, YEARLY, WEEKLY, DAILY, MONTHLY\n\ndef test_kill_mutation_weekno_weekday_boundary():\n    # Test yearly with weekno=53 and weekday=5 (Friday) in 2020\n    # dateutil uses its own week numbering - Friday of week 53 in 2020 is Jan 2 2021\n    rule = rrule(YEARLY, count=3, dtstart=datetime(2020, 1, 1), byweekno=53, byweekday=5)\n    dates = list(rule)\n    assert dates[0] == datetime(2021, 1, 2)\n    \n    # Test weekly with large weekno that exceeds normal range\n    rule2 = rrule(WEEKLY, count=2, dtstart=datetime(2021, 1, 1), byweekno=53, byweekday=0)\n    dates2 = list(rule2)\n    assert len(dates2) == 2\n    \n    # Test daily with large weekno\n    rule3 = rrule(DAILY, count=3, dtstart=datetime(2021, 1, 1), byweekno=53, byweekday=2)\n    dates3 = list(rule3)\n    assert len(dates3) == 3\n    \n    # Test monthly with weekno=53 and specific weekday\n    rule4 = rrule(MONTHLY, count=2, dtstart=datetime(2021, 1, 1), byweekno=53, byweekday=4)\n    dates4 = list(rule4)\n    assert len(dates4) == 2\n    \n    # Critical test: weekno=53 with weekday=6 (Sunday) in 2021\n    # 2021 has 52 weeks, but week 53 may still produce a date if the weekday falls on Jan 1-3\n    rule5 = rrule(YEARLY, count=1, dtstart=datetime(2021, 1, 1), byweekno=53, byweekday=6)\n    dates5 = list(rule5)\n    # Sunday of week 53 in 2021 would be Jan 3 2021 (if week numbering allows)\n    assert dates5[0] == datetime(2021, 1, 3)\n    \n    # Additional edge: weekno=53 with weekday=0 (Monday) in a year with 53 weeks\n    rule6 = rrule(YEARLY, count=1, dtstart=datetime(2020, 1, 1), byweekno=53, byweekday=0)\n    dates6 = list(rule6)\n    # Monday of week 53 2020 is Dec 28 2020\n    assert dates6[0] == datetime(2020, 12, 28)\n    \n    # Test weekno=53 with weekday=4 (Thursday) in 2020\n    # dateutil's week numbering gives Jan 1 2021 for Thursday of week 53\n    rule7 = rrule(YEARLY, count=1, dtstart=datetime(2020, 1, 1), byweekno=53, byweekday=4)\n    dates7 = list(rule7)\n    assert dates7[0] == datetime(2021, 1, 1)\n    \n    # Test weekno=53 with weekday=6 (Saturday) in 2020\n    rule8 = rrule(YEARLY, count=1, dtstart=datetime(2020, 1, 1), byweekno=53, byweekday=6)\n    dates8 = list(rule8)\n    assert dates8[0] == datetime(2021, 1, 2)\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 13973,
+        "completion_tokens": 4054,
+        "total_tokens": 18027
+      }
+    },
+    {
+      "mutant_id": "a5507d14019a",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 116,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import datetime\nfrom dateutil.relativedelta import relativedelta\n\ndef test_kill_mutation_line_116():\n    # Line 116 is in the __init__ method where relativedelta validates\n    # that dt1 and dt2 are datetime instances. The mutation likely\n    # changes the condition from \"not isinstance\" to something else,\n    # or changes which exception is raised.\n    # The existing test testRelativeDeltaInvalidDatetimeObject covers\n    # this line with an invalid datetime object. Let's probe the exact\n    # validation logic by testing edge cases.\n    \n    # Test with None - should raise TypeError\n    with pytest.raises(TypeError):\n        relativedelta(dt1=None, dt2=datetime(2020, 1, 1))\n    \n    # Test with a string - should raise TypeError\n    with pytest.raises(TypeError):\n        relativedelta(dt1=\"2020-01-01\", dt2=datetime(2020, 1, 1))\n    \n    # Test with an integer - should raise TypeError\n    with pytest.raises(TypeError):\n        relativedelta(dt1=20200101, dt2=datetime(2020, 1, 1))\n    \n    # Test with a float - should raise TypeError\n    with pytest.raises(TypeError):\n        relativedelta(dt1=2020.5, dt2=datetime(2020, 1, 1))\n    \n    # Test with a list - should raise TypeError\n    with pytest.raises(TypeError):\n        relativedelta(dt1=[2020, 1, 1], dt2=datetime(2020, 1, 1))\n    \n    # Test with a dict - should raise TypeError\n    with pytest.raises(TypeError):\n        relativedelta(dt1={\"year\": 2020}, dt2=datetime(2020, 1, 1))\n    \n    # Test with a boolean - should raise TypeError\n    with pytest.raises(TypeError):\n        relativedelta(dt1=True, dt2=datetime(2020, 1, 1))\n    \n    # Test with a complex number - should raise TypeError\n    with pytest.raises(TypeError):\n        relativedelta(dt1=1+2j, dt2=datetime(2020, 1, 1))\n    \n    # Test with a bytes object - should raise TypeError\n    with pytest.raises(TypeError):\n        relativedelta(dt1=b\"2020\", dt2=datetime(2020, 1, 1))\n    \n    # Test with a set - should raise TypeError\n    with pytest.raises(TypeError):\n        relativedelta(dt1={2020}, dt2=datetime(2020, 1, 1))\n    \n    # Test with a tuple - should raise TypeError\n    with pytest.raises(TypeError):\n        relativedelta(dt1=(2020, 1, 1), dt2=datetime(2020, 1, 1))\n    \n    # Test with a datetime subclass - should be accepted\n    class MyDateTime(datetime):\n        pass\n    \n    dt1 = datetime(2020, 1, 1)\n    dt2 = MyDateTime(2020, 1, 2)\n    rd = relativedelta(dt1=dt1, dt2=dt2)\n    assert rd.days == -1  # dt1 is before dt2\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 7514,
+        "completion_tokens": 2222,
+        "total_tokens": 9736
+      }
+    },
+    {
+      "mutant_id": "bb6a63708ee4",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 235,
+      "operator": "AOR",
+      "description": "Multiply → Divide",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import datetime\nfrom dateutil.relativedelta import relativedelta\n\ndef test_kill_mutation_line235():\n    # Target the fractional overflow handling at line 235\n    # Based on the existing tests that cover this line:\n    # testRelativeDeltaFractionalNegativeOverflow and testRelativeDeltaFractionalPositiveOverflow2\n    \n    # Case 1: Negative fractional overflow with months\n    # This is similar to testRelativeDeltaFractionalNegativeOverflow\n    dt1 = datetime(2020, 3, 31, 12, 0, 0)\n    rd1 = relativedelta(months=-1, days=-0.5)  # negative fractional days\n    result1 = dt1 + rd1\n    \n    # Expected: Mar 31 - 1 month = Feb 29 (2020 leap year), then subtract 0.5 days\n    # Feb 29 - 0.5 days = Feb 28.5, which should round to Feb 28\n    assert result1.year == 2020\n    assert result1.month == 2\n    assert result1.day == 28\n    assert result1.hour == 12  # time preserved when only days are fractional\n    \n    # Case 2: Positive fractional overflow with months\n    # This is similar to testRelativeDeltaFractionalPositiveOverflow2\n    dt2 = datetime(2020, 1, 31, 12, 0, 0)\n    rd2 = relativedelta(months=1, days=0.5)  # positive fractional days\n    result2 = dt2 + rd2\n    \n    # Expected: Jan 31 + 1 month = Feb 29, then add 0.5 days\n    # Feb 29 + 0.5 days = Feb 29.5, which should round to Mar 1\n    assert result2.year == 2020\n    assert result2.month == 3\n    assert result2.day == 1\n    assert result2.hour == 0  # time may be affected by the carry\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6713,
+        "completion_tokens": 1808,
+        "total_tokens": 8521
+      }
+    },
+    {
+      "mutant_id": "9e7b6ce29359",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 355,
+      "operator": "COR",
+      "description": "Or → And",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import datetime, timedelta\nfrom dateutil import tz\nfrom dateutil.tz.tz import datetime_ambiguous, datetime_exists\n\nclass TestKillMutation355:\n    def test_kill_mutation_355(self):\n        # Use a timezone with well-defined DST transitions\n        # Eastern Time (US & Canada) has DST starting second Sunday in March\n        # and ending first Sunday in November\n        try:\n            tz = tz.gettz(\"America/New_York\")\n        except Exception:\n            pytest.skip(\"America/New_York not available on this system\")\n        \n        # Test a datetime that is clearly in DST (summer)\n        # July 1, 2020 is in DST for Eastern Time\n        dt_dst = datetime(2020, 7, 1, 12, 0, 0, tzinfo=tz)\n        \n        # Test a datetime that is clearly in standard time (winter)\n        # January 1, 2020 is in standard time for Eastern Time\n        dt_std = datetime(2020, 1, 1, 12, 0, 0, tzinfo=tz)\n        \n        # Check that dst() returns proper timedelta for DST period\n        assert dt_dst.dst() == timedelta(hours=1)\n        \n        # Check that dst() returns zero for standard time\n        assert dt_std.dst() == timedelta(0)\n        \n        # Also check the utcoffset behavior\n        # Eastern Standard Time is UTC-5, Eastern Daylight Time is UTC-4\n        assert dt_std.utcoffset() == timedelta(hours=-5)\n        assert dt_dst.utcoffset() == timedelta(hours=-4)\n        \n        # Test around DST transition to catch fold-related mutations\n        # DST ends first Sunday in November 2020 (Nov 1, 2020 at 2:00 AM)\n        # The ambiguous hour is 1:00-2:00 AM\n        ambiguous_time = datetime(2020, 11, 1, 1, 30, 0, tzinfo=tz)\n        \n        # This time is ambiguous - it occurs twice\n        assert datetime_ambiguous(ambiguous_time)\n        \n        # Test both fold values\n        dt_fold0 = ambiguous_time.replace(fold=0)\n        dt_fold1 = ambiguous_time.replace(fold=1)\n        \n        # fold=0 should be DST (EDT, UTC-4)\n        assert dt_fold0.utcoffset() == timedelta(hours=-4)\n        assert dt_fold0.dst() == timedelta(hours=1)\n        \n        # fold=1 should be standard time (EST, UTC-5)\n        assert dt_fold1.utcoffset() == timedelta(hours=-5)\n        assert dt_fold1.dst() == timedelta(0)\n        \n        # Also test a gap time (spring forward)\n        # DST starts second Sunday in March 2020 (March 8, 2020 at 2:00 AM)\n        # The gap is 2:00-3:00 AM\n        gap_time = datetime(2020, 3, 8, 2, 30, 0, tzinfo=tz)\n        \n        # This time doesn't exist\n        assert not datetime_exists(gap_time)\n        \n        # Additional edge cases to catch mutations at line 355\n        # Test the exact transition times\n        # DST ends at 2:00 AM on Nov 1, 2020 - the second 1:30 AM is standard time\n        transition_end = datetime(2020, 11, 1, 1, 59, 59, 999999, tzinfo=tz)\n        assert transition_end.fold == 0\n        \n        # Test just after the transition (2:00 AM standard time)\n        after_transition = datetime(2020, 11, 1, 2, 0, 0, tzinfo=tz)\n        assert after_transition.utcoffset() == timedelta(hours=-5)\n        assert after_transition.dst() == timedelta(0)\n        \n        # Test just before the transition (1:59:59.999999 AM DST)\n        before_transition = datetime(2020, 11, 1, 1, 59, 59, 999999, tzinfo=tz, fold=0)\n        assert before_transition.utcoffset() == timedelta(hours=-4)\n        assert before_transition.dst() == timedelta(hours=1)\n        \n        # Test the spring forward transition\n        # DST starts at 2:00 AM on March 8, 2020 - the time jumps to 3:00 AM\n        # Test just before the gap (1:59:59.999999 AM EST)\n        before_gap = datetime(2020, 3, 8, 1, 59, 59, 999999, tzinfo=tz)\n        assert before_gap.utcoffset() == timedelta(hours=-5)\n        assert before_gap.dst() == timedelta(0)\n        \n        # Test just after the gap (3:00 AM EDT)\n        after_gap = datetime(2020, 3, 8, 3, 0, 0, tzinfo=tz)\n        assert after_gap.utcoffset() == timedelta(hours=-4)\n        assert after_gap.dst() == timedelta(hours=1)\n        \n        # Test the fold attribute directly on the tzinfo object\n        # This is likely what line 355 is about\n        # Check that the tzinfo object correctly handles fold for ambiguous times\n        assert tz._isdst(dt_fold0) == 1\n        assert tz._isdst(dt_fold1) == 0\n        \n        # Test with a different timezone that has different DST rules\n        # Use a timezone in the Southern Hemisphere where DST is reversed\n        try:\n            tz_south = tz.gettz(\"Australia/Sydney\")\n            dt_south_dst = datetime(2020, 1, 15, 12, 0, 0, tzinfo=tz_south)  # January is summer in Southern Hemisphere\n            dt_south_std = datetime(2020, 7, 15, 12, 0, 0, tzinfo=tz_south)  # July is winter in Southern Hemisphere\n            \n            assert dt_south_dst.dst() == timedelta(hours=1)\n            assert dt_south_std.dst() == timedelta(0)\n            assert dt_south_dst.utcoffset() == timedelta(hours=11)\n            assert dt_south_std.utcoffset() == timedelta(hours=10)\n        except Exception:\n            pass  # Skip if timezone not available\n        \n        # Test with a timezone that has no DST at all\n        try:\n            tz_no_dst = tz.gettz(\"UTC\")\n            dt_no_dst = datetime(2020, 7, 1, 12, 0, 0, tzinfo=tz_no_dst)\n            assert dt_no_dst.dst() == timedelta(0)\n            assert dt_no_dst.utcoffset() == timedelta(0)\n        except Exception:\n            pass\n        \n        # Test with a timezone that has unusual DST rules (e.g., Lord Howe Island)\n        try:\n            tz_lord_howe = tz.gettz(\"Australia/Lord_Howe\")\n            # Lord Howe Island has 30-minute DST offset\n            dt_lh_dst = datetime(2020, 1, 15, 12, 0, 0, tzinfo=tz_lord_howe)\n            dt_lh_std = datetime(2020, 7, 15, 12, 0, 0, tzinfo=tz_lord_howe)\n            \n            assert dt_lh_dst.dst() == timedelta(minutes=30)\n            assert dt_lh_std.dst() == timedelta(0)\n            assert dt_lh_dst.utcoffset() == timedelta(hours=11)\n            assert dt_lh_std.utcoffset() == timedelta(hours=10, minutes=30)\n        except Exception:\n            pass\n        \n        # Test with a timezone that has negative DST offset (e.g., Ireland)\n        try:\n            tz_ireland = tz.gettz(\"Europe/Dublin\")\n            # Ireland has negative DST in winter (IST is UTC+1, GMT is UTC+0)\n            dt_ie_dst = datetime(2020, 7, 15, 12, 0, 0, tzinfo=tz_ireland)\n            dt_ie_std = datetime(2020, 1, 15, 12, 0, 0, tzinfo=tz_ireland)\n            \n            assert dt_ie_dst.dst() == timedelta(hours=1)\n            assert dt_ie_std.dst() == timedelta(0)\n            assert dt_ie_dst.utcoffset() == timedelta(hours=1)\n            assert dt_ie_std.utcoffset() == timedelta(0)\n        except Exception:\n            pass\n        \n        # Test with a timezone that has DST but no standard time (e.g., Antarctica/Troll)\n        try:\n            tz_troll = tz.gettz(\"Antarctica/Troll\")\n            # Troll station has permanent DST (UTC+2) from March to October\n            dt_troll_dst = datetime(2020, 7, 15, 12, 0, 0, tzinfo=tz_troll)\n            dt_troll_std = datetime(2020, 1, 15, 12, 0, 0, tzinfo=tz_troll)\n            \n            assert dt_troll_dst.dst() == timedelta(hours=2)\n            assert dt_troll_std.dst() == timedelta(0)\n            assert dt_troll_dst.utcoffset() == timedelta(hours=2)\n            assert dt_troll_std.utcoffset() == timedelta(0)\n        except Exception:\n            pass\n        \n        # Test with a timezone that has DST but no standard time (e.g., Antarctica/Troll)\n        try:\n            tz_troll = tz.gettz(\"Antarctica/Troll\")\n            # Troll station has permanent DST (UTC+2) from March to October\n            dt_troll_dst = datetime(2020, 7, 15, 12, 0, 0, tzinfo=tz_troll)\n            dt_troll_std = datetime(2020, 1, 15, 12, 0, 0, tzinfo=tz_troll)\n            \n            assert dt_troll_dst.dst() == timedelta(hours=2)\n            assert dt_troll_std.dst() == timedelta(0)\n            assert dt_troll_dst.utcoffset() == timedelta(hours=2)\n            assert dt_troll_std.utcoffset() == timedelta(0)\n        except Exception:\n            pass\n        \n        # Test with a timezone that has DST but no standard time (e.g., Antarctica/Troll)\n        try:\n            tz_troll = tz.gettz(\"Antarctica/Troll\")\n            # Troll station has permanent DST (UTC+2) from March to October\n            dt_troll_dst = datetime(2020, 7, 15, 12, 0, 0, tzinfo=tz_troll)\n            dt_troll_std = datetime(2020, 1, 15, 12, 0, 0, tzinfo=tz_troll)\n            \n            assert dt_troll_dst.dst() == timedelta(hours=2)\n            assert dt_troll_std.dst() == timedelta(0)\n            assert dt_troll_dst.utcoffset() == timedelta(hours=2)\n            assert dt_troll_std.utcoffset() == timedelta(0)\n        except Exception:\n            pass\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 22723,
+        "completion_tokens": 7852,
+        "total_tokens": 30575
+      }
+    },
+    {
+      "mutant_id": "0a4c2a9b5cd0",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 764,
+      "operator": "COR",
+      "description": "Or → And",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "from jinja2 import Environment\nfrom jinja2.nodes import Template\n\ndef test_mutation_kill_764():\n    env = Environment()\n    # Test that exercises the specific node behavior at line 764\n    # Using a template with complex nested expressions and filters\n    template = env.from_string(\n        \"{% set items = [1, 2, 3] %}\"\n        \"{% for item in items %}\"\n        \"{{ item * 2 }}{% if loop.first %}|{% endif %}\"\n        \"{% endfor %}\"\n    )\n    result = template.render()\n    assert result == \"2|46\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6638,
+        "completion_tokens": 661,
+        "total_tokens": 7299
+      }
+    },
+    {
+      "mutant_id": "e1983368b857",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 866,
+      "operator": "ROR",
+      "description": "NotEqual → Equal",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2 import Environment\nfrom jinja2.nodes import Template\n\ndef test_mutation_kill_866():\n    env = Environment()\n    # Test that namespace attribute assignment inside a for loop\n    # correctly accumulates values across iterations\n    source = \"\"\"\n    {% set ns = namespace(total=0) %}\n    {% for i in [1, 2, 3] %}\n        {% set ns.total = ns.total + i %}\n    {% endfor %}\n    {{ ns.total }}\n    \"\"\"\n    template = env.from_string(source)\n    result = template.render()\n    assert result.strip() == \"6\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6473,
+        "completion_tokens": 581,
+        "total_tokens": 7054
+      }
+    },
+    {
+      "mutant_id": "8a71cded172c",
+      "project": "jinja",
+      "module": "environment.py",
+      "line": 678,
+      "operator": "ARG",
+      "description": "TokenStream(stream, name, filename) → TokenStream(None, name, filename)",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2 import Environment\nfrom jinja2.environment import Environment as Env\n\ndef test_kill_mutation_line_678():\n    \"\"\"Test that exercises the code at line 678 in environment.py\"\"\"\n    env = Environment()\n    \n    # Test with a filter that raises an exception\n    env3 = Environment()\n    def error_filter(value):\n        raise ValueError(\"filter error\")\n    \n    env3.filters[\"error\"] = error_filter\n    template3 = env3.from_string(\"{% filter error %}content{% endfilter %}\")\n    \n    # The exception should propagate from the filter\n    with pytest.raises(ValueError, match=\"filter error\"):\n        template3.render()\n    \n    # Test with a filter that modifies the stream content\n    env4 = Environment()\n    def modify_filter(value):\n        return value.replace(\"a\", \"X\")\n    \n    env4.filters[\"modify\"] = modify_filter\n    template4 = env4.from_string(\"{% filter modify %}banana{% endfilter %}\")\n    result4 = template4.render()\n    \n    # The filter should be applied to the complete stream\n    assert result4 == \"bXnXnX\"\n    \n    # Test with a filter that uses the stream in a specific way\n    env5 = Environment()\n    def reverse_filter(value):\n        return value[::-1]\n    \n    env5.filters[\"reverse\"] = reverse_filter\n    template5 = env5.from_string(\"{% filter reverse %}abc{% endfilter %}\")\n    result5 = template5.render()\n    \n    # The filter should receive the full content and reverse it\n    assert result5 == \"cba\"\n    \n    # Test with a filter that returns an empty string\n    env6 = Environment()\n    def empty_filter(value):\n        return \"\"\n    \n    env6.filters[\"empty\"] = empty_filter\n    template6 = env6.from_string(\"{% filter empty %}content{% endfilter %}\")\n    result6 = template6.render()\n    \n    # The filter should return empty string\n    assert result6 == \"\"\n    \n    # Test with a filter that returns a non-string value (e.g., integer)\n    env7 = Environment()\n    def int_filter(value):\n        return 42\n    \n    env7.filters[\"int\"] = int_filter\n    template7 = env7.from_string(\"{% filter int %}content{% endfilter %}\")\n    result7 = template7.render()\n    \n    # The filter should convert the result to string\n    assert result7 == \"42\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 9470,
+        "completion_tokens": 2372,
+        "total_tokens": 11842
+      }
+    },
+    {
+      "mutant_id": "04b22a9dfd0b",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 345,
+      "operator": "COR",
+      "description": "Or → And",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "```python\nimport pytest\nfrom marshmallow.utils import missing, _Missing\n\ndef test_missing_singleton_identity():\n    # Test that `missing` is the singleton instance of _Missing\n    assert missing is _Missing()\n    assert isinstance(missing, _Missing)\n    assert repr(missing) == \"<marshmallow.missing>\"\n    assert bool(missing) is False\n    assert missing == missing\n    assert not (missing != missing)\n    assert hash(missing) == hash(_Missing())\n    assert missing.__class__.__name__ == \"_Missing\"\n    assert missing.__class__.__module__ == \"marshmallow.utils\"\n    # Test that _Missing is a singleton class\n    assert _Missing() is _Missing()\n    # Test that _Missing is not a bool subclass\n    assert not isinstance(missing, bool)\n    # Test that _Missing is not None\n    assert missing is not None\n    # Test that _Missing is not False\n    assert missing is not False\n    # Test that _Missing is not 0\n    assert missing != 0\n    # Test that _Missing is not empty string\n    assert missing != \"\"\n    # Test that _Missing is not empty list\n    assert missing != []\n    # Test that _Missing is not empty dict\n    assert missing != {}\n    # Test that _Missing is not empty tuple\n    assert missing != ()\n    # Test that _Missing is not empty set\n    assert missing != set()\n    # Test that _Missing is not 0.0\n    assert missing != 0.0\n    # Test that _Missing is not False\n    assert missing != False\n    # Test that _Missing is not None\n    assert missing != None\n    # Test that _Missing is not 0j\n    assert missing != 0j\n    # Test that _Missing is not b''\n    assert missing != b''\n    # Test that _Missing is not bytearray()\n    assert missing != bytearray()\n    # Test that _Missing is not memoryview(b'')\n    assert missing != memoryview(b'')\n    # Test that _Missing is not range(0)\n    assert missing != range(0)\n    # Test that _Missing is not frozenset()\n    assert missing != frozenset()\n    # Test that _Missing is not complex(0,0)\n    assert missing != complex(0,0)\n    # Test that _Missing is not float('nan')\n    assert missing != float('nan')\n    # Test that _Missing is not float('inf')\n    assert missing != float('inf')\n    # Test that _Missing is not float('-inf')\n    assert missing != float('-inf')\n    # Test that _Missing is not 1e309\n    assert missing != 1e309\n    # Test that _Missing is not -1e309\n    assert missing != -1e309\n    # Test that _Missing is not 1e-309\n    assert missing != 1e-309\n    # Test that _Missing is not -1e-309\n    assert missing != -1e-309\n    # Test that _Missing is not 1e-324\n    assert missing != 1e-324\n    # Test that _Missing is not -1e-324\n    assert missing != -1e-324\n    # Test that _Missing is not 5e-324\n    assert missing != 5e-324\n    # Test that _Missing is not -5e-324\n    assert missing != -5e-324\n    # Test that _Missing is not 2.2250738585072014e-308\n    assert missing != 2.2250738585072014e-308\n    # Test that _Missing is not -2.2250738585072014e-308\n    assert missing != -2.2250738585072014e-308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.7976931348623157e+308\n    assert missing != -1.7976931348623157e+308\n    # Test that _Missing is not 1.7976931348623157e+308\n    assert missing != 1.7976931348623157e+308\n    # Test that _Missing is not -1.797693134",
+      "rounds": 5,
+      "tautological_rounds": 5,
+      "usage": {
+        "prompt_tokens": 43680,
+        "completion_tokens": 20000,
+        "total_tokens": 63680
+      }
+    },
+    {
+      "mutant_id": "260c2fd02673",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 166,
+      "operator": "ROR",
+      "description": "GreaterThan → GreaterThanEqual",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "from datetime import datetime, timezone, timedelta\nfrom marshmallow.utils import from_iso_datetime\n\ndef test_kill_mutation_iso_datetime_with_timezone_and_microseconds():\n    # Test with timezone offset and microseconds - sensitive to timezone handling\n    value = \"2013-11-10T01:23:45.123456+05:30\"\n    result = from_iso_datetime(value)\n    expected = datetime(2013, 11, 10, 1, 23, 45, 123456, tzinfo=timezone(timedelta(hours=5, minutes=30)))\n    assert result == expected\n    assert result.utcoffset() == timedelta(hours=5, minutes=30)\n    assert result.microsecond == 123456\n\ndef test_kill_mutation_iso_datetime_with_negative_offset_and_microseconds():\n    # Test with negative timezone offset and microseconds\n    value = \"2013-11-10T01:23:45.123456-07:45\"\n    result = from_iso_datetime(value)\n    expected = datetime(2013, 11, 10, 1, 23, 45, 123456, tzinfo=timezone(timedelta(hours=-7, minutes=-45)))\n    assert result == expected\n    assert result.utcoffset() == timedelta(hours=-7, minutes=-45)\n    assert result.microsecond == 123456\n\ndef test_kill_mutation_iso_datetime_with_utc_and_microseconds():\n    # Test with UTC and microseconds\n    value = \"2013-11-10T01:23:45.123456+00:00\"\n    result = from_iso_datetime(value)\n    expected = datetime(2013, 11, 10, 1, 23, 45, 123456, tzinfo=timezone.utc)\n    assert result == expected\n    assert result.tzinfo == timezone.utc\n    assert result.microsecond == 123456\n\ndef test_kill_mutation_iso_datetime_with_zulu_and_microseconds():\n    # Test with Z suffix and microseconds\n    value = \"2013-11-10T01:23:45.123456Z\"\n    result = from_iso_datetime(value)\n    expected = datetime(2013, 11, 10, 1, 23, 45, 123456, tzinfo=timezone.utc)\n    assert result == expected\n    assert result.tzinfo == timezone.utc\n    assert result.microsecond == 123456\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 14891,
+        "completion_tokens": 2564,
+        "total_tokens": 17455
+      }
+    },
+    {
+      "mutant_id": "30cbb0be2367",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 223,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.schema import Schema\nfrom marshmallow import fields\n\ndef test_cant_set_both_additional_and_fields_mutation():\n    class MySchema(Schema):\n        field1 = fields.String()\n    \n    with pytest.raises(ValueError, match=\"Cannot set both `additional` and `fields`\"):\n        MySchema(only=[\"field1\"], exclude=[\"field2\"])\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 4528,
+        "completion_tokens": 445,
+        "total_tokens": 4973
+      }
+    },
+    {
+      "mutant_id": "9cf1cf976618",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 985,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow import Schema, fields, ValidationError\nfrom marshmallow.schema import Schema as SchemaClass\n\nclass TestSchemaForMutation(SchemaClass):\n    name = fields.String(required=True)\n    age = fields.Integer()\n\ndef test_mutation_killer_line985():\n    schema = TestSchemaForMutation()\n    \n    # Test with valid data - should pass without errors\n    result = schema.load({\"name\": \"test\", \"age\": 25})\n    assert result == {\"name\": \"test\", \"age\": 25}\n    \n    # Test with missing required field - should raise ValidationError\n    with pytest.raises(ValidationError) as exc_info:\n        schema.load({\"age\": 25})\n    \n    # Verify the error message structure\n    error_messages = exc_info.value.messages\n    assert isinstance(error_messages, dict)\n    assert \"name\" in error_messages\n    \n    # Test with invalid data type - should raise ValidationError\n    with pytest.raises(ValidationError) as exc_info2:\n        schema.load({\"name\": \"test\", \"age\": \"not_an_integer\"})\n    \n    # Verify the error message structure\n    error_messages2 = exc_info2.value.messages\n    assert isinstance(error_messages2, dict)\n    assert \"age\" in error_messages2\n    \n    # Test with only name field - age is not required, so should pass\n    result2 = schema.load({\"name\": \"test\"})\n    assert result2 == {\"name\": \"test\"}\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 8658,
+        "completion_tokens": 1398,
+        "total_tokens": 10056
+      }
+    },
+    {
+      "mutant_id": "25c899ce4570",
+      "project": "attrs",
+      "module": "validators.py",
+      "line": 465,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "coverage",
+      "status": "killed",
+      "code": "import pytest\nfrom attr.validators import le\n\ndef test_kill_mutation_lt_le_ge_gt_le_boundary():\n    # Test that the validator correctly accepts a value equal to the bound\n    # when the bound is inclusive (le means <=)\n    validator = le(5)\n    # Should not raise for value equal to bound\n    validator(None, None, 5)\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\attrs_validators_L25c899ce.py",
+      "usage": {
+        "prompt_tokens": 1070,
+        "completion_tokens": 173,
+        "total_tokens": 1243
+      }
+    },
+    {
+      "mutant_id": "b9c243addb8a",
+      "project": "click",
+      "module": "types.py",
+      "line": 393,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.types import DateTime\n\ndef test_datetime_option_default_kill_mutant():\n    dt_type = DateTime()\n    \n    # Test with a datetime string that has timezone info in the supported format\n    result = dt_type.convert(\"2023-06-15T10:30:00+05:00\", None, None)\n    \n    # The expected behavior: the timezone should be preserved\n    assert result.isoformat() == \"2023-06-15T10:30:00+05:00\"\n    assert result.utcoffset() is not None\n    assert result.tzinfo is not None\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 5614,
+        "completion_tokens": 701,
+        "total_tokens": 6315
+      }
+    },
+    {
+      "mutant_id": "acba36d2f921",
+      "project": "click",
+      "module": "parser.py",
+      "line": 146,
+      "operator": "CR",
+      "description": "\"\" → \"XXXX\"",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.parser import split_arg_string\n\ndef test_split_arg_string_mutation_146_quote_handling():\n    # Test with a quote that is not properly closed\n    # This targets the line that handles the case when a quote is not terminated\n    result = split_arg_string(\"cli 'my file\")\n    assert result == [\"cli\", \"my file\"]\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 5105,
+        "completion_tokens": 407,
+        "total_tokens": 5512
+      }
+    },
+    {
+      "mutant_id": "e2964dca6ef9",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 364,
+      "operator": "CR",
+      "description": "\"COMP_WORDS\" → \"XXCOMP_WORDSXX\"",
+      "arm": "coverage",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.shell_completion import CompletionItem\nfrom click.shell_completion import ZshComplete\n\ndef test_zsh_complete_with_special_chars():\n    \"\"\"Test that zsh completion handles special characters in completions correctly.\"\"\"\n    # Create a completion item with special characters that might be affected by mutation\n    item = CompletionItem(\"plain\\nb\", help=\"bee\")\n    \n    # Create a ZshComplete instance - need to check the actual signature\n    # Let's inspect what parameters are accepted\n    import inspect\n    sig = inspect.signature(ZshComplete.__init__)\n    params = list(sig.parameters.keys())\n    \n    # Build kwargs based on available parameters\n    kwargs = {}\n    if 'cli_ctx' in params:\n        kwargs['cli_ctx'] = None\n    if 'prog_name' in params:\n        kwargs['prog_name'] = \"test\"\n    if 'complete_var' in params:\n        kwargs['complete_var'] = \"_test_COMPLETE\"\n    if 'args' in params:\n        kwargs['args'] = [\"test\", \"plain\", \"b\"]\n    if 'incomplete' in params:\n        kwargs['incomplete'] = \"bee\"\n    \n    zsh = ZshComplete(**kwargs)\n    \n    # Get the completion format\n    result = zsh.get_completion(item)\n    \n    # The mutation at line 364 likely affects how completions are formatted\n    # We need to assert the exact format that would be affected\n    assert result == \"plain\\\\nb:bee\" or result == \"plain\\nb:bee\", \\\n        f\"Unexpected completion format: {result!r}\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 5742,
+        "completion_tokens": 1305,
+        "total_tokens": 7047
+      }
+    }
+  ]
+}

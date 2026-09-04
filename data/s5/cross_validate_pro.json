@@ -1,0 +1,220 @@
+{
+  "model": "deepseek-v4-pro",
+  "n": 13,
+  "status_count": {
+    "suspected_equivalent": 11,
+    "killed": 2
+  },
+  "results": [
+    {
+      "mutant_id": "0c371d2eed6e",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 777,
+      "operator": "CR",
+      "description": "0 → 1",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2 import Environment\nfrom jinja2.nodes import EvalContext, _PassArg, Call, Const, Name\n\ndef test_call_eval_context_insert_position():\n    env = Environment()\n    eval_ctx = EvalContext(env)\n    \n    # Create a Name node that can be resolved\n    name_node = Name(\"test_var\", \"load\")\n    \n    # Set a variable in the eval context\n    eval_ctx.vars[\"test_var\"] = \"test_value\"\n    \n    # Create a Call node with the Name node\n    call_node = Call(node=name_node, args=[], kwargs=[], dyn_args=None, dyn_kwargs=None)\n    \n    # Call the eval method with eval_ctx as pass_arg\n    result = call_node.eval(eval_ctx)\n    \n    # The result should be the resolved value\n    assert result == \"test_value\"\n",
+      "rounds": 5,
+      "usage": {
+        "prompt_tokens": 5195,
+        "completion_tokens": 836,
+        "total_tokens": 6031
+      }
+    },
+    {
+      "mutant_id": "7736853116e2",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 709,
+      "operator": "ARG",
+      "description": "self.expr1.as_const(eval_ctx) → self.expr1.as_const(None)",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2.nodes import EvalContext, Getitem, Const, Name\nfrom jinja2.environment import Environment\n\n\ndef test_getitem_as_const_with_eval_context():\n    env = Environment()\n    eval_ctx = EvalContext(env)\n\n    # Create a Getitem node where expr1 is a Name node that resolves\n    # differently depending on whether eval_ctx is passed or None.\n    class CustomEnvironment(Environment):\n        def __init__(self):\n            super().__init__()\n            self.call_count = 0\n\n        def getattr(self, obj, attribute):\n            # This method is called during as_const for Name nodes\n            if attribute == \"some_name\":\n                self.call_count += 1\n                if self.call_count > 1:\n                    return \"wrong\"\n                return \"right\"\n            return super().getattr(obj, attribute)\n\n    custom_env = CustomEnvironment()\n    custom_eval_ctx = EvalContext(custom_env)\n\n    # Create a Name node that will be resolved via the custom environment\n    name_node = Name(\"some_name\", \"load\")\n\n    node = Getitem(\n        node=name_node,\n        arg=Const(\"key\"),\n        test=Const(True),\n    )\n\n    result = node.as_const(custom_eval_ctx)\n    assert result == \"right\"\n",
+      "rounds": 5,
+      "usage": {
+        "prompt_tokens": 6306,
+        "completion_tokens": 1335,
+        "total_tokens": 7641
+      }
+    },
+    {
+      "mutant_id": "8607eccf3b2d",
+      "project": "click",
+      "module": "types.py",
+      "line": 391,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.types import File\nfrom click import Context, Command\n\n\ndef test_file_convert_invalid_format_raises_bad_parameter():\n    ctx = Context(Command(name=\"test\"))\n    file_type = File()\n    file_type.formats = [\"txt\", \"csv\"]\n    \n    with pytest.raises(Exception) as exc_info:\n        file_type.convert(\"example.pdf\", None, ctx)\n    \n    assert \"does not match the format\" in str(exc_info.value)\n",
+      "rounds": 5,
+      "usage": {
+        "prompt_tokens": 5443,
+        "completion_tokens": 537,
+        "total_tokens": 5980
+      }
+    },
+    {
+      "mutant_id": "8a71cded172c",
+      "project": "jinja",
+      "module": "environment.py",
+      "line": 678,
+      "operator": "ARG",
+      "description": "TokenStream(stream, name, filename) → TokenStream(None, name, filename)",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2.environment import Environment\nfrom jinja2.lexer import TokenStream\n\n\ndef test_environment_compile_expression_with_filter_stream_returning_empty_list():\n    env = Environment()\n\n    def custom_filter_stream(stream):\n        # 返回空列表，原代码会将其包装为 TokenStream(空列表, name, filename)\n        # 编译表达式时不会立即报错，但在实际执行时会因为缺少 token 而失败\n        return []\n\n    env.filters[\"custom_filter_stream\"] = custom_filter_stream\n\n    result = env.compile_expression(\"1 + 2\", undefined_to_none=False)\n\n    # 原代码：TokenStream(空列表) 会导致编译出的表达式执行时抛出异常\n    # 变异后：TokenStream(None) 在构造时就会抛出 TypeError\n    with pytest.raises(Exception):\n        result()\n",
+      "rounds": 5,
+      "usage": {
+        "prompt_tokens": 5610,
+        "completion_tokens": 828,
+        "total_tokens": 6438
+      }
+    },
+    {
+      "mutant_id": "a88c7addd79b",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 545,
+      "operator": "CR",
+      "description": "True → False",
+      "status": "suspected_equivalent",
+      "code": "import click\nfrom click.shell_completion import ShellComplete\n\n\ndef test_shell_complete_allow_extra_args_true_kills_mutation():\n    cli = click.Command(\"cli\", params=[click.Argument([\"arg\"])])\n    completion = ShellComplete(cli, {}, \"cli\", \"\")\n    \n    # Access the context through the completion's internal attributes\n    # ShellComplete stores the context in _ctx or similar\n    ctx = completion._ctx\n    \n    # With allow_extra_args=True, parsing extra args should succeed\n    # With allow_extra_args=False, parsing extra args should fail\n    try:\n        ctx.parse_args([\"arg1\", \"arg2\"])\n        # If parsing succeeds, allow_extra_args must be True (original code)\n        assert ctx.allow_extra_args is True\n    except click.UsageError:\n        # If parsing fails, allow_extra_args must be False (mutant)\n        raise AssertionError(\"Mutation detected: allow_extra_args was set to False\")\n",
+      "rounds": 5,
+      "usage": {
+        "prompt_tokens": 5187,
+        "completion_tokens": 922,
+        "total_tokens": 6109
+      }
+    },
+    {
+      "mutant_id": "1ffacaf9f4e1",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 536,
+      "operator": "ARG",
+      "description": "command.resolve_command(ctx, args) → command.resolve_command(None, args)",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.shell_completion import ShellComplete\nfrom click import Command, Context\n\n\nclass DummyCommand(Command):\n    def __init__(self):\n        super().__init__(name=\"dummy\")\n        self.resolve_command_calls = []\n\n    def resolve_command(self, ctx, args):\n        self.resolve_command_calls.append((ctx, args))\n        if args and args[0] == \"sub\":\n            return \"sub\", DummySubCommand(), args[1:]\n        return self.name, None, []\n\n\nclass DummySubCommand(Command):\n    def __init__(self):\n        super().__init__(name=\"sub\")\n\n\nclass DummyShellComplete(ShellComplete):\n    def __init__(self, command, ctx, args, incomplete):\n        super().__init__(command, ctx, args, incomplete)\n        self.command = command\n        self.ctx = ctx\n\n    def get_completion_args(self):\n        args = [\"sub\"]\n        while args:\n            name, cmd, args = self.command.resolve_command(self.ctx, args)\n            if cmd is None:\n                return self.ctx\n        return self.ctx\n\n\ndef test_shell_complete_passes_ctx_to_resolve_command():\n    cmd = DummyCommand()\n    ctx = Context(cmd)\n    complete = DummyShellComplete(cmd, ctx, {}, \"\")\n\n    complete.get_completion_args()\n\n    assert len(cmd.resolve_command_calls) == 1\n    passed_ctx, passed_args = cmd.resolve_command_calls[0]\n    assert passed_ctx is ctx\n",
+      "rounds": 5,
+      "usage": {
+        "prompt_tokens": 6076,
+        "completion_tokens": 1388,
+        "total_tokens": 7464
+      }
+    },
+    {
+      "mutant_id": "f85007480a02",
+      "project": "marshmallow",
+      "module": "validate.py",
+      "line": 137,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "status": "killed",
+      "code": "import pytest\nfrom marshmallow.validate import URL\n\ndef test_url_with_dotless_hostname():\n    validator = URL(require_tld=False)\n    result = validator(\"http://example\")\n    assert result == \"http://example\"\n",
+      "rounds": 2,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_validate_Lf8500748.py",
+      "usage": {
+        "prompt_tokens": 995,
+        "completion_tokens": 103,
+        "total_tokens": 1098
+      }
+    },
+    {
+      "mutant_id": "047c73dbc2a7",
+      "project": "marshmallow",
+      "module": "validate.py",
+      "line": 625,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.validate import OneOf\nfrom marshmallow.exceptions import ValidationError\n\ndef test_oneof_type_error_message_not_none_list():\n    validator = OneOf([1, 2, 3])\n    with pytest.raises(ValidationError) as exc_info:\n        validator([1, 2])  # list is unhashable, will cause TypeError in `value not in self.choices`\n    assert exc_info.value.messages is not None\n    assert isinstance(exc_info.value.messages, list)\n    assert len(exc_info.value.messages) > 0\n    assert exc_info.value.messages[0] == \"Must be one of: 1, 2, 3.\"\n",
+      "rounds": 5,
+      "usage": {
+        "prompt_tokens": 4732,
+        "completion_tokens": 618,
+        "total_tokens": 5350
+      }
+    },
+    {
+      "mutant_id": "dcebe9041659",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 285,
+      "operator": "CR",
+      "description": "'{kn}\\\\{sn}' → 'XX{kn}\\\\{sn}XX'",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nimport sys\nimport os\n\n\ndef test_tzkeyname_format_kills_cr_mutant(monkeypatch):\n    # Find the src directory relative to the test file location\n    current_dir = os.path.dirname(os.path.abspath(__file__))\n    src_path = os.path.join(current_dir, \"..\", \"src\")\n    src_path = os.path.abspath(src_path)\n    \n    if src_path not in sys.path:\n        sys.path.insert(0, src_path)\n    \n    import dateutil.win as dateutil_win\n    \n    captured_key = {}\n\n    class FakeKey:\n        def __enter__(self):\n            return self\n\n        def __exit__(self, exc_type, exc_val, exc_tb):\n            return False\n\n    def fake_openkey(handle, tzkeyname):\n        captured_key['tzkeyname'] = tzkeyname\n        return FakeKey()\n\n    def fake_valuestodict(key):\n        return {\"TZ\": \"fake_tz\", \"Std\": \"fake_std\"}\n\n    monkeypatch.setattr(dateutil_win.winreg, \"OpenKey\", fake_openkey)\n    monkeypatch.setattr(dateutil_win, \"valuestodict\", fake_valuestodict)\n\n    tz = dateutil_win.tzwin(\"fake_std\")\n\n    assert captured_key['tzkeyname'] == r\"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones\\fake_std\"\n",
+      "rounds": 5,
+      "usage": {
+        "prompt_tokens": 7134,
+        "completion_tokens": 1316,
+        "total_tokens": 8450
+      }
+    },
+    {
+      "mutant_id": "8af3c38a852e",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 285,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nimport winreg\nimport sys\nimport os\n\ndef test_kill_arg_mutation():\n    # 找到 dateutil 包的路径并添加 win 模块\n    import dateutil\n    dateutil_path = os.path.dirname(dateutil.__file__)\n    win_module_path = os.path.join(dateutil_path, 'win.py')\n    \n    # 如果 win.py 存在，直接加载\n    if os.path.exists(win_module_path):\n        import importlib.util\n        spec = importlib.util.spec_from_file_location('dateutil.win', win_module_path)\n        win = importlib.util.module_from_spec(spec)\n        spec.loader.exec_module(win)\n    else:\n        # 尝试从 win32 子目录加载\n        win32_path = os.path.join(dateutil_path, 'win32')\n        if os.path.exists(win32_path):\n            sys.path.insert(0, win32_path)\n            import win as win_module\n            win = win_module\n        else:\n            pytest.skip(\"dateutil.win module not available\")\n    \n    # 构造一个模拟的注册表键对象\n    class MockKey:\n        def __init__(self):\n            self.values = {}\n        def __enter__(self):\n            return self\n        def __exit__(self, exc_type, exc_val, exc_tb):\n            return False\n\n    # 模拟 winreg.OpenKey 的行为\n    original_openkey = winreg.OpenKey\n    calls = []\n\n    def mock_openkey(handle, tzkeyname):\n        calls.append(tzkeyname)\n        # 当使用 None 作为键名时，模拟注册表会抛出异常\n        if tzkeyname is None or 'None' in str(tzkeyname):\n            raise FileNotFoundError(f\"Registry key not found: {tzkeyname}\")\n        return MockKey()\n\n    winreg.OpenKey = mock_openkey\n\n    try:\n        # 构造一个包含必要键的 keydict\n        keydict = {\n            \"StandardName\": \"Pacific Standard Time\",\n            \"DaylightName\": \"Pacific Daylight Time\",\n            \"TZI\": b'\\x00' * 44\n        }\n\n        # 调用被测函数\n        # 原代码会使用正确的键名，变异代码会使用 None 作为键名\n        # 当使用 None 时，mock_openkey 会抛出 FileNotFoundError\n        win._load_tzkey(\"Pacific Standard Time\", keydict)\n\n        # 验证调用 OpenKey 时使用的键名\n        assert len(calls) == 1\n        assert calls[0] == \"SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\Time Zones\\\\Pacific Standard Time\"\n    finally:\n        winreg.OpenKey = original_openkey\n",
+      "rounds": 5,
+      "usage": {
+        "prompt_tokens": 8286,
+        "completion_tokens": 2008,
+        "total_tokens": 10294
+      }
+    },
+    {
+      "mutant_id": "6869ffd242e5",
+      "project": "click",
+      "module": "parser.py",
+      "line": 233,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.parser import Option\n\n\ndef test_argument_error_message_unchanged():\n    opt = Option([\"--foo\"], dest=\"foo\")\n    opt.nargs = 2\n    \n    with pytest.raises(Exception) as exc_info:\n        opt.add_value(\"only_one_value\")\n    \n    assert \"Argument 'foo' takes 2 values.\" in str(exc_info.value)\n",
+      "rounds": 5,
+      "usage": {
+        "prompt_tokens": 4238,
+        "completion_tokens": 417,
+        "total_tokens": 4655
+      }
+    },
+    {
+      "mutant_id": "6d6e1b0a3030",
+      "project": "click",
+      "module": "parser.py",
+      "line": 438,
+      "operator": "ARG",
+      "description": "NoSuchOption(opt, ctx=self.ctx) → NoSuchOption(None, ctx=self.ctx)",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.parser import Option, OptionParser\nfrom click.core import Context, Command\nfrom click.exceptions import NoSuchOption\n\n\ndef test_no_such_option_preserves_option_name():\n    ctx = Context(Command(\"test\"))\n    parser = OptionParser(ctx)\n    parser.add_option([\"--foo\"], \"foo\", \"foo\", action=\"store_true\")\n\n    with pytest.raises(NoSuchOption) as exc_info:\n        parser.parse_args([\"--bar\"])\n\n    assert exc_info.value.option_name == \"--bar\"\n",
+      "rounds": 5,
+      "usage": {
+        "prompt_tokens": 4926,
+        "completion_tokens": 573,
+        "total_tokens": 5499
+      }
+    },
+    {
+      "mutant_id": "48d8c6087a46",
+      "project": "attrs",
+      "module": "validators.py",
+      "line": 450,
+      "operator": "ARG",
+      "description": "_NumberValidator(val, \"<\", operator.lt) → _NumberValidator(None, \"<\", operator.lt)",
+      "status": "killed",
+      "code": "import pytest\nfrom attr.validators import lt\nfrom attr.validators import _NumberValidator\n\n\ndef test_lt_preserves_bound_value():\n    validator = lt(5)\n    assert isinstance(validator, _NumberValidator)\n    assert validator.bound == 5\n",
+      "rounds": 2,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\attrs_validators_L48d8c608.py",
+      "usage": {
+        "prompt_tokens": 958,
+        "completion_tokens": 135,
+        "total_tokens": 1093
+      }
+    }
+  ]
+}

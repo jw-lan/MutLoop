@@ -1,0 +1,100 @@
+{
+  "operators": [
+    "AOR",
+    "ROR",
+    "COR",
+    "CR",
+    "ARG"
+  ],
+  "per_project": {
+    "attrs": {
+      "modules": [
+        "validators.py"
+      ],
+      "statements": 220,
+      "mutants": 60,
+      "mutants_per_statement": 0.273,
+      "operators": {
+        "ARG": 45,
+        "CR": 13,
+        "COR": 2
+      },
+      "estimated_cpu_hours": 0.11
+    },
+    "click": {
+      "modules": [
+        "types.py",
+        "parser.py",
+        "shell_completion.py"
+      ],
+      "statements": 863,
+      "mutants": 948,
+      "mutants_per_statement": 1.098,
+      "operators": {
+        "CR": 414,
+        "ARG": 443,
+        "COR": 45,
+        "ROR": 37,
+        "AOR": 9
+      },
+      "estimated_cpu_hours": 1.61
+    },
+    "dateutil": {
+      "modules": [
+        "rrule.py",
+        "relativedelta.py",
+        "tz/win.py"
+      ],
+      "statements": 1372,
+      "mutants": 2251,
+      "mutants_per_statement": 1.641,
+      "operators": {
+        "ARG": 734,
+        "AOR": 280,
+        "CR": 924,
+        "ROR": 171,
+        "COR": 142
+      },
+      "estimated_cpu_hours": 2.2
+    },
+    "jinja": {
+      "modules": [
+        "nodes.py",
+        "environment.py"
+      ],
+      "statements": 1143,
+      "mutants": 933,
+      "mutants_per_statement": 0.816,
+      "operators": {
+        "ARG": 426,
+        "CR": 477,
+        "ROR": 12,
+        "COR": 16,
+        "AOR": 2
+      },
+      "estimated_cpu_hours": 1.05
+    },
+    "marshmallow": {
+      "modules": [
+        "utils.py",
+        "validate.py",
+        "schema.py"
+      ],
+      "statements": 918,
+      "mutants": 1157,
+      "mutants_per_statement": 1.26,
+      "operators": {
+        "CR": 460,
+        "COR": 52,
+        "ARG": 598,
+        "AOR": 20,
+        "ROR": 27
+      },
+      "estimated_cpu_hours": 1.3
+    }
+  },
+  "total_mutants": 5349,
+  "total_statements": 4516,
+  "mutants_per_statement": 1.184,
+  "estimated_cpu_hours": 6.28
+}

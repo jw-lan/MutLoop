@@ -1,0 +1,429 @@
+{
+  "attrs": {
+    "__init__.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "_cmp.py": {
+      "changed_in": [
+        "25.1.0"
+      ],
+      "stable": false
+    },
+    "_compat.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "_config.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "_funcs.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "_make.py": {
+      "changed_in": [
+        "25.2.0",
+        "25.1.0"
+      ],
+      "stable": false
+    },
+    "_next_gen.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "_version_info.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "converters.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "exceptions.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "filters.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "setters.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "validators.py": {
+      "changed_in": [],
+      "stable": true
+    }
+  },
+  "click": {
+    "__init__.py": {
+      "changed_in": [
+        "8.1.7",
+        "8.1.6"
+      ],
+      "stable": false
+    },
+    "_compat.py": {
+      "changed_in": [
+        "8.1.7"
+      ],
+      "stable": false
+    },
+    "_termui_impl.py": {
+      "changed_in": [
+        "8.1.7",
+        "8.1.6"
+      ],
+      "stable": false
+    },
+    "_textwrap.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "_winconsole.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "core.py": {
+      "changed_in": [
+        "8.1.7",
+        "8.1.6"
+      ],
+      "stable": false
+    },
+    "decorators.py": {
+      "changed_in": [
+        "8.1.7",
+        "8.1.6"
+      ],
+      "stable": false
+    },
+    "exceptions.py": {
+      "changed_in": [
+        "8.1.7",
+        "8.1.6"
+      ],
+      "stable": false
+    },
+    "formatting.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "globals.py": {
+      "changed_in": [
+        "8.1.7",
+        "8.1.6"
+      ],
+      "stable": false
+    },
+    "parser.py": {
+      "changed_in": [
+        "8.1.7",
+        "8.1.6"
+      ],
+      "stable": false
+    },
+    "shell_completion.py": {
+      "changed_in": [
+        "8.1.7",
+        "8.1.6"
+      ],
+      "stable": false
+    },
+    "termui.py": {
+      "changed_in": [
+        "8.1.7",
+        "8.1.6"
+      ],
+      "stable": false
+    },
+    "testing.py": {
+      "changed_in": [
+        "8.1.7",
+        "8.1.6"
+      ],
+      "stable": false
+    },
+    "types.py": {
+      "changed_in": [
+        "8.1.7",
+        "8.1.6"
+      ],
+      "stable": false
+    },
+    "utils.py": {
+      "changed_in": [
+        "8.1.7",
+        "8.1.6"
+      ],
+      "stable": false
+    }
+  },
+  "dateutil": {
+    "__init__.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "_common.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "easter.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "parser/__init__.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "parser/_parser.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "parser/isoparser.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "relativedelta.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "rrule.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "tz/__init__.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "tz/_common.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "tz/_factories.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "tz/tz.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "tz/win.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "tzwin.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "utils.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "zoneinfo/__init__.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "zoneinfo/rebuild.py": {
+      "changed_in": [],
+      "stable": true
+    }
+  },
+  "jinja": {
+    "__init__.py": {
+      "changed_in": [
+        "3.1.5",
+        "3.1.4"
+      ],
+      "stable": false
+    },
+    "_identifier.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "async_utils.py": {
+      "changed_in": [
+        "3.1.4"
+      ],
+      "stable": false
+    },
+    "bccache.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "compiler.py": {
+      "changed_in": [
+        "3.1.4"
+      ],
+      "stable": false
+    },
+    "constants.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "debug.py": {
+      "changed_in": [
+        "3.1.4"
+      ],
+      "stable": false
+    },
+    "defaults.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "environment.py": {
+      "changed_in": [
+        "3.1.4"
+      ],
+      "stable": false
+    },
+    "exceptions.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "ext.py": {
+      "changed_in": [
+        "3.1.4"
+      ],
+      "stable": false
+    },
+    "filters.py": {
+      "changed_in": [
+        "3.1.5",
+        "3.1.4"
+      ],
+      "stable": false
+    },
+    "idtracking.py": {
+      "changed_in": [
+        "3.1.4"
+      ],
+      "stable": false
+    },
+    "lexer.py": {
+      "changed_in": [
+        "3.1.4"
+      ],
+      "stable": false
+    },
+    "loaders.py": {
+      "changed_in": [
+        "3.1.4"
+      ],
+      "stable": false
+    },
+    "meta.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "nativetypes.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "nodes.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "optimizer.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "parser.py": {
+      "changed_in": [
+        "3.1.4"
+      ],
+      "stable": false
+    },
+    "runtime.py": {
+      "changed_in": [
+        "3.1.4"
+      ],
+      "stable": false
+    },
+    "sandbox.py": {
+      "changed_in": [
+        "3.1.4"
+      ],
+      "stable": false
+    },
+    "tests.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "utils.py": {
+      "changed_in": [
+        "3.1.4"
+      ],
+      "stable": false
+    },
+    "visitor.py": {
+      "changed_in": [],
+      "stable": true
+    }
+  },
+  "marshmallow": {
+    "__init__.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "base.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "class_registry.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "decorators.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "error_store.py": {
+      "changed_in": [
+        "3.26.1",
+        "3.26.0"
+      ],
+      "stable": false
+    },
+    "exceptions.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "fields.py": {
+      "changed_in": [
+        "3.26.0"
+      ],
+      "stable": false
+    },
+    "orderedset.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "schema.py": {
+      "changed_in": [
+        "3.26.1",
+        "3.26.0"
+      ],
+      "stable": false
+    },
+    "types.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "utils.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "validate.py": {
+      "changed_in": [],
+      "stable": true
+    },
+    "warnings.py": {
+      "changed_in": [],
+      "stable": true
+    }
+  }
+}

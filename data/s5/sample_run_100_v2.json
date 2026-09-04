@@ -1,0 +1,1873 @@
+{
+  "model": "deepseek-v4-flash",
+  "arm": "directed",
+  "n": 100,
+  "status_count": {
+    "killed": 58,
+    "suspected_equivalent": 42
+  },
+  "compile_pass_rate": 100.0,
+  "kill_rate": 58.0,
+  "avg_rounds_killed": 1.9137931034482758,
+  "cheat_rate": 1.2461059190031152,
+  "results": [
+    {
+      "mutant_id": "d00a8fdaa284",
+      "project": "attrs",
+      "module": "validators.py",
+      "line": 182,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import re\nimport pytest\nfrom attr.validators import matches_re\n\ndef test_matches_re_error_message_exact_match():\n    compiled_pattern = re.compile(r\"\\d+\")\n    with pytest.raises(TypeError) as exc_info:\n        matches_re(compiled_pattern, flags=re.IGNORECASE)\n    # 精确匹配完整错误消息，变异体在消息前后添加了\"XX\"前缀和后缀\n    assert str(exc_info.value) == \"'flags' can only be used with a string pattern; pass flags to re.compile() instead\"\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\attrs_validators_Ld00a8fda.py",
+      "usage": {
+        "prompt_tokens": 1946,
+        "completion_tokens": 231,
+        "total_tokens": 2177
+      }
+    },
+    {
+      "mutant_id": "48d8c6087a46",
+      "project": "attrs",
+      "module": "validators.py",
+      "line": 450,
+      "operator": "ARG",
+      "description": "_NumberValidator(val, \"<\", operator.lt) → _NumberValidator(None, \"<\", operator.lt)",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom attr.validators import lt\nfrom types import SimpleNamespace\n\ndef test_lt_mutation():\n    validator = lt(10)\n    attr = SimpleNamespace(name=\"test_attr\")\n    with pytest.raises(ValueError):\n        validator(None, attr, 10)\n",
+      "rounds": 3,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\attrs_validators_L48d8c608.py",
+      "usage": {
+        "prompt_tokens": 3069,
+        "completion_tokens": 167,
+        "total_tokens": 3236
+      }
+    },
+    {
+      "mutant_id": "8607eccf3b2d",
+      "project": "click",
+      "module": "types.py",
+      "line": 391,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.types import DateTime\nfrom click.exceptions import BadParameter\nfrom click import Context\nfrom click.core import Parameter\n\ndef test_datetime_convert_invalid_value_raises_bad_parameter():\n    dt = DateTime()\n    param = Parameter(param_decls=(\"--test_param\",))\n    ctx = Context(Command(\"test\"))\n\n    with pytest.raises(BadParameter) as excinfo:\n        dt.convert(\"invalid-date\", param, ctx)\n\n    assert \"does not match the format\" in str(excinfo.value)\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 8195,
+        "completion_tokens": 610,
+        "total_tokens": 8805
+      }
+    },
+    {
+      "mutant_id": "333eee5ba41f",
+      "project": "click",
+      "module": "types.py",
+      "line": 267,
+      "operator": "CR",
+      "description": "\"Choose from:\\n\\t{choices}\" → \"XXChoose from:\\n\\t{choices}XX\"",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom click.types import Choice\nfrom click.core import Argument\n\ndef test_choice_get_missing_message_mutation():\n    choice = Choice([\"a\", \"b\", \"c\"])\n    param = Argument(param_decls=[\"test\"], required=True)\n    result = choice.get_missing_message(param)\n    assert result == \"Choose from:\\n\\ta,\\n\\tb,\\n\\tc\"\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\click_types_L333eee5b.py",
+      "usage": {
+        "prompt_tokens": 2123,
+        "completion_tokens": 174,
+        "total_tokens": 2297
+      }
+    },
+    {
+      "mutant_id": "ab0658b5a1c4",
+      "project": "click",
+      "module": "types.py",
+      "line": 260,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom click.types import Choice\nfrom click.core import Parameter\n\nclass FakeParam(Parameter):\n    def __init__(self, required, param_type_name):\n        self.required = required\n        self.param_type_name = param_type_name\n\ndef test_choice_get_metavar_required_false_argument():\n    choice = Choice([\"a\", \"b\"])\n    param = FakeParam(required=False, param_type_name=\"argument\")\n    # Original: required=False and argument=True -> False -> returns \"[a|b]\"\n    # Mutated: required=False or argument=True -> True -> returns \"{a|b}\"\n    assert choice.get_metavar(param) == \"[a|b]\"\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\click_types_Lab0658b5.py",
+      "usage": {
+        "prompt_tokens": 882,
+        "completion_tokens": 150,
+        "total_tokens": 1032
+      }
+    },
+    {
+      "mutant_id": "06a24fd91cee",
+      "project": "click",
+      "module": "parser.py",
+      "line": 488,
+      "operator": "ROR",
+      "description": "GreaterThan → GreaterThanEqual",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.parser import OptionParser, ParsingState, Option\n\ndef test_mutant_kill_len_next_rarg_equal_one():\n    parser = OptionParser()\n    parser._opt_prefixes = {\"-\", \"--\"}\n    \n    # Create state with rargs containing exactly \"-\" (len == 1)\n    state = ParsingState(rargs=[\"-\"])\n    \n    # Create a simple option object with _flag_needs_value True\n    class Opt:\n        _flag_needs_value = True\n    \n    opt_obj = Opt()\n    \n    # The _get_value_from_state is a nested function inside _process_opts\n    # We need to trigger it through _process_opts\n    # Let's create a proper Option object\n    # Option constructor signature: Option(params, name, opts=None, secondary_opts=None, ...)\n    # We'll create a minimal one with required dest\n    opt = Option([\"-f\"], \"flag\", \"flag\")\n    opt._flag_needs_value = True\n    \n    # Set up state\n    state = ParsingState(rargs=[\"-\"])\n    \n    # Call _process_opts with \"-f\" (the option name without attached value)\n    # This will trigger the _get_value_from_state logic\n    parser._process_opts(\"-f\", state)\n    \n    # After processing, if original code: \"-\" is popped as value\n    # If mutant: _flag_needs_value is used, and \"-\" remains in rargs\n    # Check the observable behavior\n    assert state.rargs == []  # Original pops the value\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 10541,
+        "completion_tokens": 2027,
+        "total_tokens": 12568
+      }
+    },
+    {
+      "mutant_id": "6869ffd242e5",
+      "project": "click",
+      "module": "parser.py",
+      "line": 233,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom click.parser import Argument, ParsingState\nfrom click.exceptions import BadArgumentUsage\n\n\nclass MockCoreArgument:\n    def __init__(self):\n        self.envvar = None\n\n\ndef test_argument_process_raises_bad_usage_with_correct_message():\n    # Setup\n    arg = Argument(obj=MockCoreArgument(), dest=\"myarg\", nargs=3)\n    state = ParsingState(rargs=[])\n    value = [\"val1\", None, \"val3\"]  # holes=1, not all None\n\n    # Execute & Assert\n    with pytest.raises(BadArgumentUsage) as exc_info:\n        arg.process(value, state)\n\n    # The mutation changes the message prefix/suffix, so check exact message\n    assert str(exc_info.value) == \"Argument 'myarg' takes 3 values.\"\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\click_parser_L6869ffd2.py",
+      "usage": {
+        "prompt_tokens": 2107,
+        "completion_tokens": 393,
+        "total_tokens": 2500
+      }
+    },
+    {
+      "mutant_id": "6d6e1b0a3030",
+      "project": "click",
+      "module": "parser.py",
+      "line": 438,
+      "operator": "ARG",
+      "description": "NoSuchOption(opt, ctx=self.ctx) → NoSuchOption(None, ctx=self.ctx)",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom click.parser import OptionParser, ParsingState\nfrom click.exceptions import NoSuchOption\nfrom click import Context\nimport click\n\n\n@click.command()\ndef dummy_command():\n    pass\n\n\ndef test_mutation_short_opt_unknown_option_message():\n    ctx = Context(dummy_command)\n    parser = OptionParser(ctx=ctx)\n    # 构造一个不存在的短选项，例如 -z\n    arg = \"-z\"\n    state = ParsingState(rargs=[])\n    \n    with pytest.raises(NoSuchOption) as excinfo:\n        parser._match_short_opt(arg, state)\n    \n    # 检查异常消息中包含选项名 \"-z\"\n    assert \"-z\" in str(excinfo.value)\n",
+      "rounds": 4,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\click_parser_L6d6e1b0a.py",
+      "usage": {
+        "prompt_tokens": 5344,
+        "completion_tokens": 674,
+        "total_tokens": 6018
+      }
+    },
+    {
+      "mutant_id": "d6f9c383e9ce",
+      "project": "click",
+      "module": "parser.py",
+      "line": 460,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.parser import OptionParser\nfrom click.parser import ParsingState\nfrom click import Option\n\nclass TestMutationKill:\n    def test_kill_and_to_or_mutation(self):\n        # Create a parser with a known short option\n        parser = OptionParser()\n        parser.ignore_unknown_options = True\n        \n        # Add an option properly using the internal structure\n        opt = Option(['-v'], is_flag=True)\n        # Directly set the internal _short_opt dict\n        parser._short_opt = {'v': opt}\n        \n        # Create a state with required rargs parameter\n        state = ParsingState(rargs=[])\n        state.largs = []\n        \n        # Call _match_short_opt with '-v' - this consumes the option\n        # and unknown_options remains empty\n        parser._match_short_opt('-v', state)\n        \n        # The issue is that '-v' is a known option, so it gets processed\n        # and doesn't go into the unknown_options branch at all.\n        # But we need to understand the code flow better.\n        # Let's trace through the code:\n        # arg = '-v', i starts at 1\n        # It finds 'v' in _short_opt, processes it as a flag\n        # i becomes 2, which is len(arg), so no trailing chars\n        # unknown_options remains empty\n        # Then at line 460: if self.ignore_unknown_options and unknown_options:\n        # unknown_options is empty -> condition is False -> no append\n        # So largs should be empty for original code\n        \n        # But the test showed largs got ['-v'] - that means something else happened\n        # Let me check if the option processing itself appends to largs\n        # Looking at the code, option.process(value, state) is called\n        # For a flag option, it might set a value in state but not largs\n        \n        # Let me actually check what happens by examining the state after the call\n        # Maybe the issue is that the option processing itself modifies largs\n        \n        # Let's just assert that largs is empty for the original code\n        # If the mutation changes the condition to OR, then with ignore_unknown_options=True\n        # and unknown_options empty, the condition becomes True and it appends\n        # prefix + ''.join([]) = '-' + '' = '-'\n        # So for mutated code, largs would be ['-']\n        # For original code, largs should be []\n        \n        # But we saw largs = ['-v'] - that's unexpected\n        # Let me check if maybe the option processing itself adds to largs\n        # Or maybe the _match_short_opt method has other logic\n        \n        # Let me just check what the actual behavior is by printing state\n        # But since we can't print, let's just assert what we expect\n        # For original code with a known flag option, largs should be empty\n        # Let me verify by checking the actual click source\n        \n        # Actually, I think the issue might be that when we set _short_opt directly,\n        # the option object might not be fully initialized. Let's use a different approach.\n        \n        # Let's create a parser and use the proper internal method to add options\n        # Looking at click's source, OptionParser has _add_option internally\n        # But we can't call private methods easily\n        \n        # Let's try a different approach: create a parser with no options\n        # and use an arg that is not a valid short option\n        # This will make unknown_options non-empty, which won't kill the mutation\n        \n        # We need a case where unknown_options is empty but the condition is reached\n        # This happens when we have a known option that consumes all characters\n        # Let's try with an option that takes a value and we provide exactly the right amount\n        \n        parser2 = OptionParser()\n        parser2.ignore_unknown_options = True\n        opt2 = Option(['-o'], nargs=1)\n        parser2._short_opt = {'o': opt2}\n        \n        state2 = ParsingState(rargs=[])\n        state2.largs = []\n        \n        # Call with '-ovalue' - this consumes 'o' and 'value' as the option value\n        # i goes from 1 to 6 (len('-ovalue')), so no trailing chars\n        # unknown_options remains empty\n        parser2._match_short_opt('-ovalue', state2)\n        \n        # For original code: condition is False -> largs stays empty\n        # For mutated code: condition is True -> largs gets ['-']\n        assert state2.largs == [], f\"Expected no largs appended, but got {state2.largs}\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 11818,
+        "completion_tokens": 3447,
+        "total_tokens": 15265
+      }
+    },
+    {
+      "mutant_id": "a88c7addd79b",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 545,
+      "operator": "CR",
+      "description": "True → False",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nimport click\nfrom click.shell_completion import ShellComplete\nfrom click.testing import CliRunner\n\n\nclass _TestShellComplete(ShellComplete):\n    name = \"test\"\n    def get_completion_args(self):\n        return [], \"\"\n    def format_completion(self, item):\n        return item.value\n    def complete(self):\n        return []\n\n\ndef test_mutant_kill_allow_extra_args_false():\n    @click.group()\n    def cli():\n        pass\n\n    @cli.command()\n    @click.argument('arg')\n    def subcmd(arg):\n        pass\n\n    runner = CliRunner()\n    # This triggers the _resolve_context path with nested commands\n    # and extra args that should be allowed when allow_extra_args=True\n    result = runner.invoke(cli, ['subcmd', 'value', 'extra1', 'extra2'])\n    # With allow_extra_args=True, extra args are accepted and stored in protected_args\n    # With allow_extra_args=False, extra args cause an error\n    assert result.exit_code == 0\n    assert 'extra1' in result.output or result.output == ''\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 8271,
+        "completion_tokens": 1254,
+        "total_tokens": 9525
+      }
+    },
+    {
+      "mutant_id": "1ffacaf9f4e1",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 536,
+      "operator": "ARG",
+      "description": "command.resolve_command(ctx, args) → command.resolve_command(None, args)",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import click\nfrom click.testing import CliRunner\n\ndef test_mutation_arg_operator():\n    @click.group(chain=True)\n    def cli():\n        pass\n\n    @cli.command()\n    def cmd1():\n        pass\n\n    @cli.command()\n    def cmd2():\n        pass\n\n    runner = CliRunner()\n    # Use a command that requires context to resolve properly\n    # The chained command with multiple subcommands triggers the while loop\n    # where resolve_command is called with ctx in original code\n    result = runner.invoke(cli, [\"cmd1\", \"cmd2\"], prog_name=\"test_cli\")\n    # Original code: ctx is passed, so resolve_command can access ctx.command\n    # Mutated code: None is passed, causing AttributeError when accessing ctx.command\n    # This should result in a non-zero exit code for the mutated version\n    assert result.exit_code == 0\n    assert result.exception is None\n    # Add a check that the command actually executed successfully\n    assert \"Usage\" not in result.output\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 7678,
+        "completion_tokens": 926,
+        "total_tokens": 8604
+      }
+    },
+    {
+      "mutant_id": "414653a0e789",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 392,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import os\nimport pytest\nfrom click.shell_completion import FishComplete\n\ndef test_fish_complete_mutation_kill():\n    os.environ[\"COMP_WORDS\"] = \"fish partial\"\n    os.environ[\"COMP_CWORD\"] = \"partial\"\n    \n    fish = FishComplete(cli=None, ctx_args={}, prog_name=\"fish\", complete_var=\"_FISH_COMPLETE\")\n    \n    args, incomplete = fish.get_completion_args()\n    \n    # Original: incomplete and args and args[-1] == incomplete -> True, pops last element\n    # Mutated: incomplete and args or args[-1] == incomplete -> True, pops last element\n    # Both pop, so need a case where original doesn't pop but mutated does\n    # Set args[-1] != incomplete, but incomplete truthy and args non-empty\n    os.environ[\"COMP_WORDS\"] = \"fish other\"\n    os.environ[\"COMP_CWORD\"] = \"partial\"\n    \n    args, incomplete = fish.get_completion_args()\n    assert args == [\"other\"]\n",
+      "rounds": 4,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\click_shell_completion_L414653a0.py",
+      "usage": {
+        "prompt_tokens": 5129,
+        "completion_tokens": 618,
+        "total_tokens": 5747
+      }
+    },
+    {
+      "mutant_id": "8592b3b13da2",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 462,
+      "operator": "ROR",
+      "description": "GreaterThan → GreaterThanEqual",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click import Argument, Context\nfrom click.shell_completion import FishComplete\nfrom click.testing import CliRunner\nimport click\nfrom click.core import ParameterSource\n\n\nclass TestFishCompleteMutation:\n    def test_kill_greater_than_to_greater_than_equal(self):\n        @click.command()\n        @click.argument('empty', nargs=1, required=False)\n        def cli(empty):\n            pass\n\n        runner = CliRunner()\n        with runner.isolation():\n            ctx = cli.make_context('cli', [])\n            param = cli.params[0]\n            assert isinstance(param, Argument)\n            # Set parameter source to COMMANDLINE\n            ctx._parameter_source = {param.name: ParameterSource.COMMANDLINE}\n            # Set value to empty tuple, length 0\n            ctx.params[param.name] = ()\n\n            fish = FishComplete(cli, [], '', '')\n            # Access the method from the parent class\n            result = fish._is_incomplete_argument(ctx, param)\n            # Original: nargs > 1 (1 > 1 False) -> False\n            # Mutated: nargs >= 1 (1 >= 1 True) and isinstance((), tuple) True and len(()) < 1 (0 < 1 True) -> True\n            assert result is False\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 11806,
+        "completion_tokens": 2022,
+        "total_tokens": 13828
+      }
+    },
+    {
+      "mutant_id": "36ec4ba6d86c",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 72,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom dateutil.rrule import weekday\n\ndef test_weekday_n_zero_raises_value_error():\n    with pytest.raises(ValueError) as excinfo:\n        weekday(0, n=0)\n    assert str(excinfo.value) == \"Can't create weekday with n==0\"\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_rrule_L36ec4ba6.py",
+      "usage": {
+        "prompt_tokens": 734,
+        "completion_tokens": 70,
+        "total_tokens": 804
+      }
+    },
+    {
+      "mutant_id": "2a804980d87c",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 72,
+      "operator": "CR",
+      "description": "\"Can't create weekday with n==0\" → \"XXCan't create weekday with n==0XX\"",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom dateutil.rrule import weekday\n\ndef test_weekday_n_zero_exact_message():\n    with pytest.raises(ValueError) as excinfo:\n        weekday(0, n=0)\n    assert str(excinfo.value) == \"Can't create weekday with n==0\"\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_rrule_L2a804980.py",
+      "usage": {
+        "prompt_tokens": 1694,
+        "completion_tokens": 126,
+        "total_tokens": 1820
+      }
+    },
+    {
+      "mutant_id": "e8cde621800c",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 490,
+      "operator": "ROR",
+      "description": "Equal → NotEqual",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom dateutil.rrule import rrule\nfrom datetime import datetime\n\ndef test_mutant_kill_bysetpos_zero():\n    with pytest.raises(ValueError):\n        rrule(freq=2, dtstart=datetime(2020, 1, 1), bysetpos=0)\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_rrule_Le8cde621.py",
+      "usage": {
+        "prompt_tokens": 872,
+        "completion_tokens": 70,
+        "total_tokens": 942
+      }
+    },
+    {
+      "mutant_id": "f41d83b2691c",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 159,
+      "operator": "COR",
+      "description": "Or → And",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom datetime import datetime\nfrom dateutil.rrule import rrule, DAILY\n\ndef test_rrule_getitem_slice_with_step_zero():\n    start = datetime(2020, 1, 1)\n    rule = rrule(DAILY, dtstart=start, count=10)\n    \n    # Original code: step=0 -> uses 1 (no skipping), returns 5 elements\n    # Mutated code: step=0 -> uses 0, raises ValueError\n    # We want original to pass, mutated to fail.\n    # So we assert that no exception is raised and result is correct.\n    # Mutated will raise, causing test failure.\n    result = rule[0:5:0]\n    assert len(result) == 5\n    assert result[0] == start\n    assert result[-1] == datetime(2020, 1, 5)\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_rrule_Lf41d83b2.py",
+      "usage": {
+        "prompt_tokens": 2132,
+        "completion_tokens": 677,
+        "total_tokens": 2809
+      }
+    },
+    {
+      "mutant_id": "40a5c3572975",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 923,
+      "operator": "AOR",
+      "description": "Add → Subtract",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom datetime import datetime\nfrom dateutil.rrule import rrule, WEEKLY, MO, TU, WE, TH, FR, SA, SU\n\ndef test_kill_aor_weekly_interval():\n    # This test triggers the WEEKLY branch in _iter() where wkst > weekday\n    # Original: day += -(weekday+1+(6-wkst)) + self._interval*7\n    # Mutant:   day += -(weekday+1+(6-wkst)) - self._interval*7\n    # With wkst=SU(6), weekday=MO(0), interval=1:\n    # Original: day += -(0+1+(6-6)) + 7 = -1 + 7 = 6\n    # Mutant:   day += -(0+1+(6-6)) - 7 = -1 - 7 = -8\n    # This difference will produce different dates.\n    \n    # Start on Monday, weekly with weekstart=Sunday\n    start = datetime(2020, 1, 6)  # Monday\n    rule = rrule(WEEKLY, dtstart=start, count=3, wkst=SU)\n    \n    # Get the list of dates\n    dates = list(rule)\n    \n    # Expected dates for original code:\n    # 2020-01-06 (Monday), 2020-01-13 (Monday), 2020-01-20 (Monday)\n    expected = [\n        datetime(2020, 1, 6),\n        datetime(2020, 1, 13),\n        datetime(2020, 1, 20)\n    ]\n    \n    assert dates == expected\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_rrule_L40a5c357.py",
+      "usage": {
+        "prompt_tokens": 759,
+        "completion_tokens": 366,
+        "total_tokens": 1125
+      }
+    },
+    {
+      "mutant_id": "5f8c40b84d57",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 420,
+      "operator": "COR",
+      "description": "Or → And",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom dateutil.relativedelta import relativedelta\n\ndef test_sub_leapdays_or_vs_and():\n    rd1 = relativedelta(leapdays=1)\n    rd2 = relativedelta(leapdays=0)\n    result = rd1 - rd2\n    assert result.leapdays == 1\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_relativedelta_L5f8c40b8.py",
+      "usage": {
+        "prompt_tokens": 842,
+        "completion_tokens": 78,
+        "total_tokens": 920
+      }
+    },
+    {
+      "mutant_id": "4c766449cd53",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 116,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom datetime import date\nfrom dateutil.relativedelta import relativedelta\n\ndef test_mutant_kill():\n    with pytest.raises(TypeError) as excinfo:\n        relativedelta(date(2020, 1, 1), \"not a date\")\n    assert str(excinfo.value) == \"relativedelta only diffs datetime/date\"\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_relativedelta_L4c766449.py",
+      "usage": {
+        "prompt_tokens": 922,
+        "completion_tokens": 85,
+        "total_tokens": 1007
+      }
+    },
+    {
+      "mutant_id": "a5507d14019a",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 116,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import date, datetime\nfrom dateutil.relativedelta import relativedelta\n\ndef test_mutation_kill():\n    with pytest.raises(TypeError) as excinfo:\n        relativedelta(dt1=date(2020, 1, 1), dt2=datetime(2020, 1, 2, 12, 0, 0))\n    assert str(excinfo.value) == \"relativedelta only diffs datetime/date\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 7227,
+        "completion_tokens": 502,
+        "total_tokens": 7729
+      }
+    },
+    {
+      "mutant_id": "53b880ddea19",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 213,
+      "operator": "ROR",
+      "description": "GreaterThan → GreaterThanEqual",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom dateutil.relativedelta import relativedelta\n\ndef test_mutation_yearday_59():\n    rd = relativedelta(yearday=59)\n    assert rd.leapdays == 0\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_relativedelta_L53b880dd.py",
+      "usage": {
+        "prompt_tokens": 1871,
+        "completion_tokens": 105,
+        "total_tokens": 1976
+      }
+    },
+    {
+      "mutant_id": "9c4fcef142bd",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 234,
+      "operator": "AOR",
+      "description": "Multiply → Divide",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom dateutil.relativedelta import relativedelta\n\ndef test_kill_aor_multiply_to_divide():\n    # Trigger _fix() with microseconds > 999999 and negative sign\n    # For microseconds = -1000001, s = -1\n    # Original: divmod(1000001, 1000000) = (1, 1) → microseconds=1, seconds+=1\n    # Mutated: divmod(1000001.0, 1000000) = (1.0, 1.0) → microseconds=1.0, seconds+=1.0\n    # But microseconds must be int, so mutated code will produce float and break later\n    rd = relativedelta(microseconds=-1000001)\n    # After _fix, microseconds should be int 1 and seconds should be int 1\n    assert rd.microseconds == 1\n    assert rd.seconds == 1\n    assert isinstance(rd.microseconds, int)\n    assert isinstance(rd.seconds, int)\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 8716,
+        "completion_tokens": 1194,
+        "total_tokens": 9910
+      }
+    },
+    {
+      "mutant_id": "8af3c38a852e",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 285,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom unittest.mock import patch, MagicMock\nfrom dateutil.tz.win import tzwinlocal\n\nclass FakeKey:\n    def __enter__(self):\n        return self\n    def __exit__(self, *args):\n        return False\n\ndef test_tzwinlocal_mutation_kill():\n    # Mock winreg.ConnectRegistry and OpenKey to simulate registry access\n    fake_handle = MagicMock()\n    fake_tzlocalkey = MagicMock()\n    fake_tzkey = MagicMock()\n    \n    # Simulate the registry values returned by valuestodict\n    fake_tzlocalkey_dict = {\n        \"StandardName\": \"Eastern Standard Time\",\n        \"DaylightName\": \"Eastern Daylight Time\",\n        \"Bias\": 300,\n        \"StandardBias\": 0,\n        \"DaylightBias\": -60,\n        \"StandardStart\": b'\\x01\\x00\\x00\\x00\\x05\\x00\\x00\\x00\\x02\\x00\\x00\\x00\\x00\\x00\\x00\\x00',\n        \"DaylightStart\": b'\\x01\\x00\\x00\\x00\\x05\\x00\\x00\\x00\\x02\\x00\\x00\\x00\\x00\\x00\\x00\\x00'\n    }\n    \n    # For the second OpenKey (tzkey), we need to return a dict with \"Display\"\n    fake_tzkey_dict = {\"Display\": \"Eastern Time (US & Canada)\"}\n    \n    # Mock valuestodict to return different dicts based on the key\n    def mock_valuestodict(key):\n        if key == fake_tzlocalkey:\n            return fake_tzlocalkey_dict\n        elif key == fake_tzkey:\n            return fake_tzkey_dict\n        return {}\n    \n    with patch('dateutil.tz.win.valuestodict', side_effect=mock_valuestodict) as mock_valuestodict:\n        # Mock winreg.ConnectRegistry and OpenKey\n        with patch('dateutil.tz.win.winreg.ConnectRegistry', return_value=fake_handle) as mock_connect:\n            with patch('dateutil.tz.win.winreg.OpenKey') as mock_openkey:\n                # First OpenKey call (for tzlocalkey) returns a context manager\n                mock_tzlocalkey_cm = FakeKey()\n                mock_tzlocalkey_cm.__enter__ = MagicMock(return_value=fake_tzlocalkey)\n                \n                # Second OpenKey call (for tzkey) returns a context manager\n                mock_tzkey_cm = FakeKey()\n                mock_tzkey_cm.__enter__ = MagicMock(return_value=fake_tzkey)\n                \n                mock_openkey.side_effect = [mock_tzlocalkey_cm, mock_tzkey_cm]\n                \n                # Create instance - this will trigger the mutated line\n                tz = tzwinlocal()\n                \n                # The mutation changes TZKEYNAME to None, which would cause\n                # the format string to produce \"None\\\\Eastern Standard Time\"\n                # which would not exist in registry, so OpenKey would raise OSError\n                # and _display would be set to None.\n                # In original code, TZKEYNAME is a valid string, so OpenKey succeeds\n                # and _display would be set to \"Eastern Time (US & Canada)\".\n                # We assert that _display is not None to kill the mutation.\n                assert tz._display is not None\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 13578,
+        "completion_tokens": 3466,
+        "total_tokens": 17044
+      }
+    },
+    {
+      "mutant_id": "dcebe9041659",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 285,
+      "operator": "CR",
+      "description": "'{kn}\\\\{sn}' → 'XX{kn}\\\\{sn}XX'",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom unittest.mock import patch\nfrom dateutil.tz.win import tzwinlocal\nfrom dateutil.tz.win import TZKEYNAME\nimport winreg\n\ndef test_tzwinlocal_mutation_kill():\n    \"\"\"Test that tzwinlocal correctly reads registry key with proper path.\"\"\"\n    # Mock the registry functions to control the behavior\n    with patch('dateutil.tz.win.winreg.ConnectRegistry') as mock_connect, \\\n         patch('dateutil.tz.win.winreg.OpenKey') as mock_open, \\\n         patch('dateutil.tz.win.valuestodict') as mock_valuestodict:\n        \n        # Setup mock registry handles\n        mock_handle = mock_connect.return_value.__enter__.return_value\n        mock_tzlocalkey = mock_open.return_value.__enter__.return_value\n        \n        # Mock valuestodict for the local key\n        mock_valuestodict.side_effect = [\n            {\n                \"StandardName\": \"Test Standard\",\n                \"DaylightName\": \"Test Daylight\",\n                \"Bias\": 300,\n                \"StandardBias\": 0,\n                \"DaylightBias\": -60,\n                \"StandardStart\": b'\\x01\\x00\\x01\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00',\n                \"DaylightStart\": b'\\x01\\x00\\x01\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00'\n            },\n            {\n                \"Display\": \"Test Display\"\n            }\n        ]\n        \n        # Track the key name used in OpenKey\n        opened_keys = []\n        \n        def mock_open_key(handle, keyname, *args, **kwargs):\n            opened_keys.append(keyname)\n            return mock_open.return_value\n        \n        mock_open.side_effect = mock_open_key\n        \n        # Create the tzwinlocal instance\n        tz = tzwinlocal()\n        \n        # Verify the correct registry key was opened\n        expected_key = f\"{TZKEYNAME}\\\\Test Standard\"\n        assert expected_key in opened_keys, f\"Expected key '{expected_key}' to be opened, but got {opened_keys}\"\n        \n        # Verify the display value was set correctly\n        assert tz._display == \"Test Display\"\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_win_Ldcebe904.py",
+      "usage": {
+        "prompt_tokens": 2767,
+        "completion_tokens": 1016,
+        "total_tokens": 3783
+      }
+    },
+    {
+      "mutant_id": "ffc59e202f2e",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 135,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom dateutil.tz.win import tzwinbase\n\nclass ConcreteTZWinBase(tzwinbase):\n    def __init__(self, std_offset, dst_offset, stddayofweek, dstdayofweek,\n                 stdweeknumber, dstweeknumber, stdhour, dsthour,\n                 stdminute, dstminute, std_abbr, dst_abbr):\n        self._std_offset = std_offset\n        self._dst_offset = dst_offset\n        self._stddayofweek = stddayofweek\n        self._dstdayofweek = dstdayofweek\n        self._stdweeknumber = stdweeknumber\n        self._dstweeknumber = dstweeknumber\n        self._stdhour = stdhour\n        self._dsthour = dsthour\n        self._stdminute = stdminute\n        self._dstminute = dstminute\n        self._std_abbr = std_abbr\n        self._dst_abbr = dst_abbr\n\ndef test_eq_mutation_and_to_or():\n    # Two objects that differ only in _dst_abbr, but have same _std_abbr\n    obj1 = ConcreteTZWinBase(\n        std_offset=1, dst_offset=2, stddayofweek=0, dstdayofweek=0,\n        stdweeknumber=1, dstweeknumber=1, stdhour=0, dsthour=0,\n        stdminute=0, dstminute=0, std_abbr=\"EST\", dst_abbr=\"EDT\"\n    )\n    obj2 = ConcreteTZWinBase(\n        std_offset=1, dst_offset=2, stddayofweek=0, dstdayofweek=0,\n        stdweeknumber=1, dstweeknumber=1, stdhour=0, dsthour=0,\n        stdminute=0, dstminute=0, std_abbr=\"EST\", dst_abbr=\"CDT\"\n    )\n    # Original: requires both _std_abbr and _dst_abbr equal -> False\n    # Mutated:  requires _std_abbr equal OR _dst_abbr equal -> True\n    assert (obj1 == obj2) is False\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_win_Lffc59e20.py",
+      "usage": {
+        "prompt_tokens": 2889,
+        "completion_tokens": 966,
+        "total_tokens": 3855
+      }
+    },
+    {
+      "mutant_id": "3fbd2065ddae",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 293,
+      "operator": "AOR",
+      "description": "Subtract → Add",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import datetime\nimport struct\nfrom unittest.mock import patch\nfrom dateutil.tz.win import tzwinlocal\n\ndef test_tzwinlocal_mutant_kill():\n    # Mock the registry data to control Bias and StandardBias values\n    mock_keydict = {\n        \"StandardName\": \"Test Standard\",\n        \"DaylightName\": \"Test Daylight\",\n        \"Bias\": 300,  # -300 minutes = UTC+5\n        \"StandardBias\": 60,  # StandardBias = 60 minutes\n        \"DaylightBias\": 30,\n        \"StandardStart\": struct.pack(\"=8h\", 0, 1, 0, 0, 0, 0, 0, 0),\n        \"DaylightStart\": struct.pack(\"=8h\", 0, 4, 0, 0, 0, 0, 0, 0),\n    }\n    \n    # Mock valuestodict to return our controlled data\n    with patch('dateutil.tz.win.valuestodict', return_value=mock_keydict):\n        # Mock winreg operations\n        with patch('dateutil.tz.win.winreg.ConnectRegistry'), \\\n             patch('dateutil.tz.win.winreg.OpenKey'), \\\n             patch('dateutil.tz.win.winreg.HKEY_LOCAL_MACHINE'):\n            tz = tzwinlocal()\n    \n    # Original: stdoffset = -300 - 60 = -360 minutes = -6 hours\n    # Mutant:   stdoffset = -300 + 60 = -240 minutes = -4 hours\n    # Expected original std_offset = -6 hours\n    expected_std_offset = datetime.timedelta(minutes=-360)\n    assert tz._std_offset == expected_std_offset, \\\n        f\"Expected std_offset {expected_std_offset}, got {tz._std_offset}\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 11009,
+        "completion_tokens": 2077,
+        "total_tokens": 13086
+      }
+    },
+    {
+      "mutant_id": "31ed87866fa4",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 341,
+      "operator": "ROR",
+      "description": "NotEqual → Equal",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import datetime\nfrom dateutil.tz.win import tzwinlocal\n\ndef test_picknthweekday_mutation_kill():\n    # picknthweekday is a module-level function in dateutil.tz.win\n    # but it's defined inside the class in the mutated code context.\n    # Since it's a static method (no self), we need to call it via the class\n    # but the class doesn't expose it directly. Let's access it via the module.\n    import dateutil.tz.win as win_module\n    picknthweekday = win_module.picknthweekday\n    \n    # Choose a year/month where the 5th (whichweek=5) occurrence of a weekday\n    # falls outside the month, so the original code subtracts one week.\n    # Example: March 2023, whichweek=5, dayofweek=0 (Sunday)\n    # March 2023 has 31 days. Sundays in March 2023: 5,12,19,26 -> only 4 Sundays,\n    # so the 5th Sunday would be April 2, 2023. Original code subtracts one week\n    # to get March 26, 2023. Mutated code (==) would NOT subtract, returning April 2.\n    result = picknthweekday(2023, 3, 0, 12, 0, 5)\n    expected = datetime.datetime(2023, 3, 26, 12, 0)\n    assert result == expected\n",
+      "rounds": 3,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_win_L31ed8786.py",
+      "usage": {
+        "prompt_tokens": 4203,
+        "completion_tokens": 804,
+        "total_tokens": 5007
+      }
+    },
+    {
+      "mutant_id": "4743ae645ad9",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 767,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import inspect\nimport pytest\nfrom jinja2.nodes import Filter, Const\nfrom jinja2 import Environment\nfrom jinja2.exceptions import TemplateRuntimeError\n\ndef test_kill_and_or_mutation():\n    # Create an async environment\n    env = Environment(autoescape=True, enable_async=True)\n    \n    # Create a filter function that is NOT async and has no async variant\n    def my_filter(value):\n        return value\n    \n    # Register the filter\n    env.filters['my_filter'] = my_filter\n    \n    # Create a Filter node - need to check the actual constructor signature\n    # Looking at the source, Filter inherits from _FilterTestCommon which inherits from Expr\n    # The Expr class has 'node' as attribute, but Filter's __init__ might be different\n    # Let's use the correct way to instantiate\n    from jinja2.nodes import Filter as FilterNode\n    # Check the actual signature\n    import inspect as insp\n    sig = insp.signature(FilterNode.__init__)\n    # The signature likely has 'node' as first arg after self\n    # But the error says unknown attribute, so let's try positional\n    node = FilterNode(Const(42), 'my_filter', [], [], None, None)\n    \n    # Get the eval context using the internal method\n    from jinja2.nodes import EvalContext\n    eval_ctx = EvalContext(environment=env)\n    \n    # For original code: is_async is True, but func is not async and has no async variant\n    # So the condition (is_async and (False or False)) is False -> should NOT raise Impossible\n    # For mutated code: (is_async or (False or False)) is True -> raises Impossible\n    \n    # Test that as_const returns the expected value (original behavior)\n    result = node.as_const(eval_ctx)\n    assert result == 42\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\jinja_nodes_L4743ae64.py",
+      "usage": {
+        "prompt_tokens": 9642,
+        "completion_tokens": 1580,
+        "total_tokens": 11222
+      }
+    },
+    {
+      "mutant_id": "7736853116e2",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 709,
+      "operator": "ARG",
+      "description": "self.expr1.as_const(eval_ctx) → self.expr1.as_const(None)",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2.nodes import CondExpr, Const, EnvironmentAttribute\nfrom jinja2 import Environment\n\ndef test_cond_expr_as_const_with_eval_ctx():\n    env = Environment()\n    env.undefined = 'custom_undefined'\n    \n    # EnvironmentAttribute requires a valid attribute name from the environment\n    # 'undefined' is a valid attribute\n    expr1 = EnvironmentAttribute('undefined')\n    test = Const(True)\n    expr2 = Const('fallback')\n    \n    # CondExpr fields are test, expr1, expr2 - but EnvironmentAttribute is not a valid Expr?\n    # Actually EnvironmentAttribute is a subclass of Expr, so it should work\n    # But the error says unknown attribute 'test' - that's from EnvironmentAttribute.__init__\n    # Wait, the error is from EnvironmentAttribute constructor? No, it says line 145 in nodes.py\n    # Let's check: EnvironmentAttribute.__init__ takes a name parameter, not test\n    # The error is because we're passing test=test to EnvironmentAttribute? No, we're passing to CondExpr\n    # Let's check the actual error: \"unknown attribute 'test'\" - that's from EnvironmentAttribute.__init__\n    # Because EnvironmentAttribute.__init__ expects a name, but we're passing test=test to CondExpr?\n    # Actually the traceback shows line 18: node = CondExpr(test=test, expr1=expr1, expr2=expr2)\n    # But the error is from nodes.py:145 which is in EnvironmentAttribute.__init__\n    # That means expr1 is being constructed incorrectly? No, expr1 is already constructed.\n    # Let me re-read: the error says \"unknown attribute 'test'\" - that's from EnvironmentAttribute.__init__\n    # But we're not calling EnvironmentAttribute with test=... \n    # Wait, maybe CondExpr.__init__ is calling something? \n    # Let me check: CondExpr inherits from Expr, and Expr.__init__ might be doing something.\n    # Actually, the issue is that EnvironmentAttribute is not a valid Expr subclass for CondExpr?\n    # Let's use a different approach.\n    \n    # Use a simple Const that returns a value based on eval_ctx? Const.as_const ignores eval_ctx.\n    # Let's use a custom node that checks eval_ctx is not None.\n    # But we can't define custom nodes easily.\n    \n    # Let's use a different node: `jinja2.nodes.Name` with a constant value?\n    # Name.as_const with eval_ctx tries to resolve from environment.\n    # If we set env.globals['x'] = 'value', then Name('x','load').as_const(eval_ctx) returns 'value'\n    # If eval_ctx is None, it raises Impossible.\n    # So let's use Name.\n    \n    from jinja2.nodes import Name\n    env.globals['x'] = 'custom_value'\n    expr1 = Name('x', 'load')\n    test = Const(True)\n    expr2 = Const('fallback')\n    \n    node = CondExpr(test=test, expr1=expr1, expr2=expr2)\n    \n    from jinja2.nodes import EvalContext\n    eval_ctx = EvalContext(environment=env)\n    \n    result = node.as_const(eval_ctx)\n    assert result == 'custom_value'\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 11788,
+        "completion_tokens": 2418,
+        "total_tokens": 14206
+      }
+    },
+    {
+      "mutant_id": "0c371d2eed6e",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 777,
+      "operator": "CR",
+      "description": "0 → 1",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2.nodes import Filter, Const\nfrom jinja2 import Environment\nfrom jinja2.nodes import EvalContext\n\ndef test_filter_as_const_with_eval_context_arg():\n    env = Environment()\n    \n    # Register a filter that checks if eval_ctx is passed as first or second arg\n    def my_filter_check(value, eval_ctx=None):\n        if eval_ctx is not None:\n            return value + 100\n        return value + 1\n    \n    env.filters['my_filter_check'] = my_filter_check\n    \n    # Create a Filter node - use positional args in correct order\n    filter_node = Filter(Const(1), 'my_filter_check', [], [], None, None)\n    \n    # Create an EvalContext\n    eval_ctx = EvalContext(env)\n    \n    # Call as_const with an eval_ctx\n    result = filter_node.as_const(eval_ctx)\n    \n    # Original: args = [eval_ctx, 1] -> func(eval_ctx, 1) -> eval_ctx is not None -> 1+100=101\n    # Mutated: args = [1, eval_ctx] -> func(1, eval_ctx) -> eval_ctx is None (since second param) -> 1+1=2\n    assert result == 101\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 10133,
+        "completion_tokens": 1581,
+        "total_tokens": 11714
+      }
+    },
+    {
+      "mutant_id": "737100f6b6e4",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 842,
+      "operator": "ROR",
+      "description": "NotEqual → Equal",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2.nodes import Getitem, Const, Name\nfrom jinja2 import Environment\n\ndef test_getitem_as_const_ctx_not_load():\n    env = Environment()\n    node = Getitem(\n        node=Name(\"key\", \"load\"),\n        arg=Const(\"value\"),\n        ctx=\"store\"\n    )\n    with pytest.raises(Exception):\n        node.as_const(env)\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6653,
+        "completion_tokens": 431,
+        "total_tokens": 7084
+      }
+    },
+    {
+      "mutant_id": "436346ef7913",
+      "project": "jinja",
+      "module": "environment.py",
+      "line": 1657,
+      "operator": "ROR",
+      "description": "LessThanEqual → LessThan",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom jinja2.environment import TemplateStream\n\ndef test_enable_buffering_size_one():\n    stream = TemplateStream(iter([]))\n    with pytest.raises(ValueError):\n        stream.enable_buffering(size=1)\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\jinja_environment_L436346ef.py",
+      "usage": {
+        "prompt_tokens": 761,
+        "completion_tokens": 57,
+        "total_tokens": 818
+      }
+    },
+    {
+      "mutant_id": "8a71cded172c",
+      "project": "jinja",
+      "module": "environment.py",
+      "line": 678,
+      "operator": "ARG",
+      "description": "TokenStream(stream, name, filename) → TokenStream(None, name, filename)",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom jinja2.environment import Environment\nfrom jinja2.lexer import TokenStream\n\ndef test_tokenize_mutation_kill():\n    env = Environment()\n    \n    # Create a custom extension that returns a non-TokenStream object\n    # from filter_stream, which will trigger the mutated code path\n    class CustomExtension:\n        identifier = \"custom_extension\"\n        priority = 10\n        \n        def __init__(self, environment):\n            self.environment = environment\n            \n        def preprocess(self, source, name, filename=None):\n            return source\n            \n        def filter_stream(self, stream):\n            # Return a list instead of TokenStream to trigger the conversion\n            return list(stream)\n    \n    # Register the extension\n    env.add_extension(CustomExtension)\n    \n    # This should trigger _tokenize with a non-TokenStream result\n    # from the extension's filter_stream\n    result = env._tokenize(\"Hello {{ name }}\", \"test_template\", \"test.html\")\n    \n    # The result should be a TokenStream with the correct name and filename\n    assert isinstance(result, TokenStream)\n    assert result.name == \"test_template\"\n    assert result.filename == \"test.html\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\jinja_environment_L8a71cded.py",
+      "usage": {
+        "prompt_tokens": 8215,
+        "completion_tokens": 1173,
+        "total_tokens": 9388
+      }
+    },
+    {
+      "mutant_id": "0bcda6b33c2f",
+      "project": "jinja",
+      "module": "environment.py",
+      "line": 814,
+      "operator": "CR",
+      "description": "\"result\" → \"XXresultXX\"",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom jinja2.environment import Environment\n\ndef test_compile_expression_mutation():\n    env = Environment()\n    expr = env.compile_expression(\"42\")\n    # 原代码：expr() 返回 42；变异代码：expr() 抛出 UndefinedError\n    assert expr() == 42\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\jinja_environment_L0bcda6b3.py",
+      "usage": {
+        "prompt_tokens": 2413,
+        "completion_tokens": 544,
+        "total_tokens": 2957
+      }
+    },
+    {
+      "mutant_id": "0bf228106e99",
+      "project": "jinja",
+      "module": "environment.py",
+      "line": 857,
+      "operator": "AOR",
+      "description": "LeftShift → RightShift",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import os\nimport tempfile\nimport zipfile\nfrom jinja2 import Environment, FileSystemLoader\n\ndef test_compile_zip_external_attr():\n    with tempfile.TemporaryDirectory() as tmpdir:\n        target = os.path.join(tmpdir, \"output.zip\")\n        template_dir = os.path.join(tmpdir, \"templates\")\n        os.makedirs(template_dir)\n        \n        # 创建模板文件\n        with open(os.path.join(template_dir, \"hello.html\"), \"w\") as f:\n            f.write(\"Hello {{ name }}!\")\n        \n        env = Environment(loader=FileSystemLoader(template_dir))\n        \n        # 调用 compile_templates 生成 zip\n        env.compile_templates(target, zip=\"deflated\", ignore_errors=False)\n        \n        # 检查 zip 内容\n        with zipfile.ZipFile(target, \"r\") as zf:\n            # 获取 zip 中的文件名（可能包含路径）\n            names = zf.namelist()\n            assert len(names) == 1, f\"Expected 1 file, got {names}\"\n            \n            # 获取文件信息\n            info = zf.getinfo(names[0])\n            # 原代码: 0o755 << 16 = 0o7550000 (十进制 25165824)\n            # 变异代码: 0o755 >> 16 = 0 (十进制 0)\n            assert info.external_attr == 0o755 << 16, f\"external_attr = {info.external_attr}\"\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\jinja_environment_L0bf22810.py",
+      "usage": {
+        "prompt_tokens": 2220,
+        "completion_tokens": 716,
+        "total_tokens": 2936
+      }
+    },
+    {
+      "mutant_id": "c5818c67ed4b",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 43,
+      "operator": "CR",
+      "description": "\"<marshmallow.missing>\" → \"XX<marshmallow.missing>XX\"",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom marshmallow.utils import _Missing\n\ndef test_missing_repr():\n    missing_instance = _Missing()\n    assert repr(missing_instance) == \"<marshmallow.missing>\"\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_utils_Lc5818c67.py",
+      "usage": {
+        "prompt_tokens": 808,
+        "completion_tokens": 47,
+        "total_tokens": 855
+      }
+    },
+    {
+      "mutant_id": "85f49894fca4",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 200,
+      "operator": "COR",
+      "description": "Or → And",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom marshmallow.utils import from_timestamp\n\ndef test_from_timestamp_boolean_true():\n    with pytest.raises(ValueError):\n        from_timestamp(True)\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_utils_L85f49894.py",
+      "usage": {
+        "prompt_tokens": 841,
+        "completion_tokens": 43,
+        "total_tokens": 884
+      }
+    },
+    {
+      "mutant_id": "58a839aa9f83",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 319,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom marshmallow.utils import set_value\n\ndef test_set_value_raises_value_error_with_message_when_target_not_dict():\n    dct = {\"foo\": \"existing_value\"}\n    with pytest.raises(ValueError, match=\"Cannot set foo.bar in foo due to existing value: existing_value\"):\n        set_value(dct, \"foo.bar\", 42)\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_utils_L58a839aa.py",
+      "usage": {
+        "prompt_tokens": 1790,
+        "completion_tokens": 151,
+        "total_tokens": 1941
+      }
+    },
+    {
+      "mutant_id": "27e811fea547",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 145,
+      "operator": "ROR",
+      "description": "LessThan → LessThanEqual",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import datetime as dt\nfrom marshmallow.utils import get_fixed_timezone\n\ndef test_get_fixed_timezone_zero_offset():\n    result = get_fixed_timezone(0)\n    assert result.tzname(None) == \"+0000\"\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_utils_L27e811fe.py",
+      "usage": {
+        "prompt_tokens": 1063,
+        "completion_tokens": 56,
+        "total_tokens": 1119
+      }
+    },
+    {
+      "mutant_id": "c4ca4fea7609",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 167,
+      "operator": "AOR",
+      "description": "Add → Subtract",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom marshmallow.utils import from_iso_datetime\n\ndef test_from_iso_datetime_mutation_aor():\n    # This test kills the mutation: Add → Subtract in offset calculation\n    # For a timezone like \"+0530\", original: offset = 60*5 + 30 = 330 minutes\n    # Mutated: offset = 60*5 - 30 = 270 minutes\n    # The resulting datetime should have tzinfo with correct offset\n    result = from_iso_datetime(\"2023-01-01T12:00:00+0530\")\n    # Original offset: +5:30 = 330 minutes = 5.5 hours\n    # Mutated offset: +4:30 = 270 minutes = 4.5 hours\n    # Check the UTC offset of the result\n    assert result.utcoffset().total_seconds() == 330 * 60\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_utils_Lc4ca4fea.py",
+      "usage": {
+        "prompt_tokens": 932,
+        "completion_tokens": 202,
+        "total_tokens": 1134
+      }
+    },
+    {
+      "mutant_id": "047c73dbc2a7",
+      "project": "marshmallow",
+      "module": "validate.py",
+      "line": 625,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.exceptions import ValidationError\nfrom marshmallow.validate import OneOf\n\ndef test_oneof_type_error_raises_validation_error_with_non_none_message():\n    validator = OneOf(choices=[1, 2, 3])\n    with pytest.raises(ValidationError) as excinfo:\n        validator([1, 2])  # list is unhashable, triggers TypeError\n    # Original code: raises ValidationError(self._format_error(value))\n    # which has a non-None message\n    # Mutated code: raises ValidationError(None) which has message None\n    assert excinfo.value.messages is not None\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 8415,
+        "completion_tokens": 727,
+        "total_tokens": 9142
+      }
+    },
+    {
+      "mutant_id": "f85007480a02",
+      "project": "marshmallow",
+      "module": "validate.py",
+      "line": 137,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.validate import URL, ValidationError\n\ndef test_url_without_tld_and_without_scheme():\n    validator = URL(relative=True, absolute=False, require_tld=False)\n    # Original code accepts \"example\" as a valid dotless hostname\n    # Mutated code wraps the regex with XX...XX, so \"example\" should be rejected\n    # We need to test the actual behavior: original passes, mutant fails\n    # So we assert that validation succeeds (no exception) for original\n    # and would fail for mutant - but since we can't know which is running,\n    # we assert the positive case: it should NOT raise ValidationError\n    # This will pass on original and fail on mutant\n    validator(\"example\")\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 8068,
+        "completion_tokens": 688,
+        "total_tokens": 8756
+      }
+    },
+    {
+      "mutant_id": "4abb46520414",
+      "project": "marshmallow",
+      "module": "validate.py",
+      "line": 231,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.validate import URL\n\ndef test_url_file_scheme_without_triple_slash():\n    validator = URL(relative=False, absolute=True, require_tld=True)\n    # Input: scheme == \"file\" but does NOT start with \"file:///\"\n    # Original (And): condition False -> else branch -> regex.search(\"file://example.com/path\")\n    # Mutated (Or): condition True -> if branch -> regex.search(\"file://localhost/example.com/path\")\n    # The original should FAIL because \"file://example.com\" is not a valid URL (no host after file://)\n    # The mutated might PASS because it becomes \"file://localhost/example.com/path\" which is valid\n    with pytest.raises(Exception):\n        validator.validate(\"file://example.com/path\")\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 7665,
+        "completion_tokens": 810,
+        "total_tokens": 8475
+      }
+    },
+    {
+      "mutant_id": "ecfd850dd8bd",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 221,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom marshmallow.schema import SchemaOpts\n\ndef test_schema_opts_additional_invalid_type():\n    class InvalidMeta:\n        additional = \"not_a_list_or_tuple\"\n        fields = ()\n        exclude = ()\n    \n    with pytest.raises(ValueError) as excinfo:\n        SchemaOpts(InvalidMeta)\n    \n    assert str(excinfo.value) == \"`additional` option must be a list or tuple.\"\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_schema_Lecfd850d.py",
+      "usage": {
+        "prompt_tokens": 930,
+        "completion_tokens": 98,
+        "total_tokens": 1028
+      }
+    },
+    {
+      "mutant_id": "64d08d707ccf",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 221,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom marshmallow.schema import SchemaOpts\n\ndef test_schema_opts_invalid_additional_raises_value_error():\n    class Meta:\n        additional = \"not-a-list-or-tuple\"\n    \n    with pytest.raises(ValueError) as excinfo:\n        SchemaOpts(Meta)\n    \n    assert str(excinfo.value) == \"`additional` option must be a list or tuple.\"\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_schema_L64d08d70.py",
+      "usage": {
+        "prompt_tokens": 944,
+        "completion_tokens": 93,
+        "total_tokens": 1037
+      }
+    },
+    {
+      "mutant_id": "9f0f81f2cbc9",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 1138,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom marshmallow import Schema\nfrom marshmallow import base\n\nclass TestSchema:\n    def test_bind_field_with_field_class_and_not_type(self):\n        # Create a schema instance\n        schema = Schema()\n        \n        # Create a field class that is a subclass of FieldABC\n        class MyField(base.FieldABC):\n            def _deserialize(self, value, attr, data, **kwargs):\n                return value\n            def _serialize(self, value, attr, obj, **kwargs):\n                return value\n            def deserialize(self, value, attr=None, data=None, **kwargs):\n                return value\n            def serialize(self, attr, obj, accessor=None, **kwargs):\n                return value\n        \n        # Create an instance of the field class\n        field_instance = MyField()\n        \n        # Mock _bind_to_schema to raise TypeError\n        def raise_type_error(*args, **kwargs):\n            raise TypeError(\"mock error\")\n        field_instance._bind_to_schema = raise_type_error\n        \n        # Now call _bind_field directly\n        with pytest.raises(TypeError) as exc_info:\n            schema._bind_field(\"test_field\", field_instance)\n        \n        # For original code: isinstance(field_instance, type) is False, \n        # so condition is False -> re-raise original TypeError (\"mock error\")\n        # For mutated code: issubclass(field_instance, base.FieldABC) is True,\n        # so condition is True -> raise custom TypeError with message\n        \n        # Check that the error message is the original one (original behavior)\n        # This will fail on mutated code because mutated raises custom message\n        assert str(exc_info.value) == \"mock error\"\n",
+      "rounds": 3,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_schema_L9f0f81f2.py",
+      "usage": {
+        "prompt_tokens": 4932,
+        "completion_tokens": 1270,
+        "total_tokens": 6202
+      }
+    },
+    {
+      "mutant_id": "8469bddc0372",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 1090,
+      "operator": "ROR",
+      "description": "GreaterThan → GreaterThanEqual",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow import Schema, fields\n\nclass TestSchemaWithSingleField(Schema):\n    field_a = fields.String(data_key=\"only_key\")\n\ndef test_single_field_no_error():\n    # Original code: count(\"only_key\") == 1, so > 1 is False, no error\n    # Mutated code: count(\"only_key\") >= 1 is True, so it will raise ValueError\n    # We need to assert that no exception is raised\n    schema = TestSchemaWithSingleField()\n    assert schema.fields[\"field_a\"].data_key == \"only_key\"\n    assert len(schema.fields) == 1\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 7418,
+        "completion_tokens": 633,
+        "total_tokens": 8051
+      }
+    },
+    {
+      "mutant_id": "a735cd35cef3",
+      "project": "attrs",
+      "module": "validators.py",
+      "line": 450,
+      "operator": "CR",
+      "description": "\"<\" → \"XX<XX\"",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom attr.validators import lt\n\ndef test_lt_mutation_kill():\n    validator = lt(10)\n    # The mutation changes the compare_op from \"<\" to \"XX<XX\"\n    # The __repr__ method exposes the compare_op\n    assert repr(validator) == \"<Validator for x < 10>\"\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\attrs_validators_La735cd35.py",
+      "usage": {
+        "prompt_tokens": 763,
+        "completion_tokens": 76,
+        "total_tokens": 839
+      }
+    },
+    {
+      "mutant_id": "28085a79b9b3",
+      "project": "attrs",
+      "module": "validators.py",
+      "line": 495,
+      "operator": "ARG",
+      "description": "_NumberValidator(val, \">\", operator.gt) → _NumberValidator(None, \">\", operator.gt)",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom attr.validators import _NumberValidator\n\ndef test_gt_mutation_kill():\n    # 直接调用 gt 方法（如果存在），否则手动构造\n    try:\n        validator = _NumberValidator.gt(10)\n    except AttributeError:\n        # 如果 gt 不是类方法，则直接实例化\n        validator = _NumberValidator(10, \">\", lambda x, y: x > y)\n    \n    class SimpleAttr:\n        name = \"test_attr\"\n    attr_obj = SimpleAttr()\n    \n    # 原始代码：bound=10，value=15 时 15 > 10 为 True，不抛异常\n    # 变异代码：bound=None，value=15 时 15 > None 会抛出 TypeError\n    # 所以用 value=15 来区分：原始代码通过，变异代码抛 TypeError\n    validator(None, attr_obj, 15)  # 原始代码不会抛异常，变异代码会抛 TypeError\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6778,
+        "completion_tokens": 728,
+        "total_tokens": 7506
+      }
+    },
+    {
+      "mutant_id": "8607eccf3b2d",
+      "project": "click",
+      "module": "types.py",
+      "line": 391,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom click.types import DateTime\nfrom click.exceptions import BadParameter\nfrom click import Context, Command\n\ndef test_datetime_convert_invalid_value_raises_bad_parameter():\n    dt = DateTime()\n    cmd = Command('test')\n    ctx = Context(cmd)\n\n    with pytest.raises(BadParameter) as excinfo:\n        dt.convert('invalid-date', None, ctx)\n\n    # 原代码会抛出包含格式信息的异常消息\n    # 变异后调用 self.fail(None, param, ctx) 会抛出 TypeError 或异常消息为 None\n    # 这里断言异常消息包含格式信息，变异后消息为 None 则失败\n    assert \"does not match the format\" in str(excinfo.value)\n",
+      "rounds": 4,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\click_types_L8607eccf.py",
+      "usage": {
+        "prompt_tokens": 6205,
+        "completion_tokens": 670,
+        "total_tokens": 6875
+      }
+    },
+    {
+      "mutant_id": "333eee5ba41f",
+      "project": "click",
+      "module": "types.py",
+      "line": 267,
+      "operator": "CR",
+      "description": "\"Choose from:\\n\\t{choices}\" → \"XXChoose from:\\n\\t{choices}XX\"",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom click.types import Choice\nfrom click.core import Argument\n\ndef test_choice_get_missing_message_mutation():\n    choice = Choice([\"a\", \"b\"])\n    param = Argument(param_decls=[\"test\"], required=True)\n    result = choice.get_missing_message(param)\n    assert result == \"Choose from:\\n\\ta,\\n\\tb\"\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\click_types_L333eee5b.py",
+      "usage": {
+        "prompt_tokens": 2116,
+        "completion_tokens": 160,
+        "total_tokens": 2276
+      }
+    },
+    {
+      "mutant_id": "9778edb8a887",
+      "project": "click",
+      "module": "types.py",
+      "line": 923,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import os\nimport tempfile\nimport click\nfrom click.types import Path\nfrom click import Context\n\ndef test_mutant_kill_executable_or():\n    # Create a temporary file that is executable\n    with tempfile.NamedTemporaryFile(delete=False) as f:\n        temp_path = f.name\n    try:\n        os.chmod(temp_path, 0o755)  # rwxr-xr-x, executable\n        \n        # Create a Path type with executable=True\n        path_type = Path(exists=True, executable=True)\n        \n        # Create a proper Click command and context\n        @click.command()\n        def dummy():\n            pass\n        \n        ctx = Context(dummy)\n        # Use a real parameter from the command\n        param = dummy.params[0] if dummy.params else None\n        if param is None:\n            # Create a simple option parameter\n            @click.command()\n            @click.option('--test', type=click.Path(exists=True, executable=True))\n            def dummy2(test):\n                pass\n            ctx = Context(dummy2)\n            param = dummy2.params[0]\n        \n        # Original: executable=True and not os.access(value, os.X_OK) -> False (since accessible) -> no fail\n        # Mutant: executable=True or not os.access(...) -> True (because executable=True) -> fail\n        result = path_type.convert(temp_path, param, ctx)\n        assert result == temp_path  # Should pass for original, fail for mutant\n    finally:\n        os.unlink(temp_path)\n",
+      "rounds": 4,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\click_types_L9778edb8.py",
+      "usage": {
+        "prompt_tokens": 6127,
+        "completion_tokens": 1265,
+        "total_tokens": 7392
+      }
+    },
+    {
+      "mutant_id": "2f7d85bfa906",
+      "project": "click",
+      "module": "parser.py",
+      "line": 94,
+      "operator": "ROR",
+      "description": "LessThan → LessThanEqual",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.parser import OptionParser\n\ndef test_mutation_ror_nargs_less_than_equal():\n    parser = OptionParser()\n    parser.add_option(\"-a\", \"--arg\", \"dest\", nargs=-1)\n    \n    with pytest.raises(TypeError):\n        parser.parse_args([\"-a\", \"value1\", \"value2\"])\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6977,
+        "completion_tokens": 391,
+        "total_tokens": 7368
+      }
+    },
+    {
+      "mutant_id": "d30a19085dc8",
+      "project": "click",
+      "module": "parser.py",
+      "line": 145,
+      "operator": "CR",
+      "description": "True → False",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.parser import split_arg_string\n\ndef test_split_arg_string_mutation_kill():\n    # With whitespace_split=True (original), shlex splits on whitespace and\n    # returns multiple tokens. With whitespace_split=False (mutated), shlex\n    # treats the entire input as a single token because whitespace is not\n    # a separator, so the result will be a list with one element.\n    result = split_arg_string(\"hello world\")\n    assert result == [\"hello\", \"world\"]\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6443,
+        "completion_tokens": 577,
+        "total_tokens": 7020
+      }
+    },
+    {
+      "mutant_id": "3544586c0528",
+      "project": "click",
+      "module": "parser.py",
+      "line": 473,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.parser import OptionParser, ParsingState, Option\nfrom click.exceptions import BadOptionUsage\n\nclass FakeOption:\n    def __init__(self):\n        self._flag_needs_value = False\n\ndef test_mutation_arg_raise_bad_option_usage_with_option_name():\n    parser = OptionParser()\n    option = Option([\"--test\"], dest=\"test\")\n    option.obj = FakeOption()\n    option.nargs = 2\n    state = ParsingState()\n    state.rargs = []  # fewer args than nargs\n\n    with pytest.raises(BadOptionUsage) as excinfo:\n        parser._get_value_from_state(\"--test\", option, state)\n\n    # The mutation changes the first argument from option_name to None.\n    # In the original code, the exception message will contain the option name.\n    # In the mutated code, the first argument is None, so the message will be different.\n    assert excinfo.value.message is not None\n    assert \"--test\" in excinfo.value.message\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 8024,
+        "completion_tokens": 1111,
+        "total_tokens": 9135
+      }
+    },
+    {
+      "mutant_id": "59b1fabe3b25",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 546,
+      "operator": "CR",
+      "description": "False → True",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import click\nfrom click.testing import CliRunner\nfrom click.shell_completion import CompletionItem\n\n@click.group()\ndef cli():\n    pass\n\n@cli.group()\ndef sub():\n    pass\n\n@sub.command()\n@click.option('--opt', is_flag=True)\ndef subcmd(opt):\n    pass\n\ndef test_mutation_allow_interspersed_args():\n    runner = CliRunner()\n    # Test with an option that has a value after the subcommand\n    # With allow_interspersed_args=False, '--opt' after 'subcmd' is treated\n    # as an option to subcmd, and 'value' is treated as an argument to subcmd\n    # which fails because subcmd doesn't accept arguments.\n    # With allow_interspersed_args=True, '--opt' would be treated as an option\n    # to sub (since interspersed args are allowed), and 'value' would be\n    # treated as an argument to sub, which also fails but with different error.\n    result = runner.invoke(cli, ['sub', 'subcmd', '--opt', 'value'])\n    # The original code should fail with \"Got unexpected extra argument\"\n    # because subcmd doesn't accept arguments.\n    # The mutated code would fail with \"No such option\" because '--opt'\n    # is not an option of sub.\n    assert result.exit_code != 0\n    assert \"Got unexpected extra argument\" in result.output\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 10268,
+        "completion_tokens": 1551,
+        "total_tokens": 11819
+      }
+    },
+    {
+      "mutant_id": "6ce715a7c280",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 541,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click import MultiCommand, Context, Command, Group\nfrom click.shell_completion import CompletionItem, ShellComplete\nfrom click.testing import CliRunner\nimport click\n\n\nclass _TestMultiCommand(MultiCommand):\n    def __init__(self, *args, **kwargs):\n        super().__init__(*args, **kwargs)\n        self._commands = {}\n\n    def list_commands(self, ctx):\n        return sorted(self._commands.keys())\n\n    def get_command(self, ctx, cmd_name):\n        return self._commands.get(cmd_name)\n\n\ndef test_mutation_kill_chain_make_context_name():\n    \"\"\"测试chain MultiCommand中make_context的name参数被改为None时行为不同\"\"\"\n    runner = CliRunner()\n\n    # 构造一个chain的MultiCommand，其中子命令会检查自己的name\n    class NameCheckingCommand(Command):\n        def make_context(self, info_name, args, parent=None, **extra):\n            # 检查info_name是否为None\n            if info_name is None:\n                raise RuntimeError(\"info_name is None\")\n            return super().make_context(info_name, args, parent=parent, **extra)\n\n    sub_cmd1 = NameCheckingCommand(\"sub1\", callback=lambda: None)\n    sub_cmd2 = NameCheckingCommand(\"sub2\", callback=lambda: None)\n\n    class ChainGroup(Group):\n        def __init__(self, *args, **kwargs):\n            super().__init__(*args, **kwargs)\n            self.chain = True\n\n    chain_group = ChainGroup(\"chain_group\")\n    chain_group.add_command(sub_cmd1)\n    chain_group.add_command(sub_cmd2)\n\n    # 构造一个包含chain group的父命令\n    @click.group()\n    def cli():\n        pass\n\n    cli.add_command(chain_group)\n\n    # 触发completion，会调用_resolve_context\n    # 当chain group处理参数时，会进入while args循环\n    # 在变异点，make_context的name参数从name变为None\n    # 如果name为None，NameCheckingCommand会抛出RuntimeError\n    result = runner.invoke(cli, [\"chain_group\", \"sub1\", \"sub2\"], prog_name=\"test_cli\")\n\n    # 原代码中，name会被正确传递，不会抛出异常，exit_code为0\n    # 变异后，name为None，NameCheckingCommand抛出RuntimeError，exit_code不为0\n    assert result.exit_code == 0\n    assert \"info_name is None\" not in result.output\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 12171,
+        "completion_tokens": 2779,
+        "total_tokens": 14950
+      }
+    },
+    {
+      "mutant_id": "66de62b29b68",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 470,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom datetime import datetime, timezone\nfrom dateutil.rrule import rrule\n\ndef test_mutant_kill():\n    # Original code raises ValueError with specific message\n    # Mutant code raises ValueError with message None (since it passes None as first arg)\n    with pytest.raises(ValueError) as excinfo:\n        rrule(\n            freq=0,  # YEARLY\n            dtstart=datetime(2020, 1, 1, tzinfo=timezone.utc),\n            until=datetime(2020, 12, 31)  # naive datetime, not UTC\n        )\n    # Check that the exception message is not None\n    assert excinfo.value.args[0] is not None\n    assert \"RRULE UNTIL values must be specified in UTC\" in str(excinfo.value)\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_rrule_L66de62b2.py",
+      "usage": {
+        "prompt_tokens": 2564,
+        "completion_tokens": 287,
+        "total_tokens": 2851
+      }
+    },
+    {
+      "mutant_id": "2a804980d87c",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 72,
+      "operator": "CR",
+      "description": "\"Can't create weekday with n==0\" → \"XXCan't create weekday with n==0XX\"",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom dateutil.rrule import weekday\n\ndef test_weekday_n_zero_raises_value_error():\n    with pytest.raises(ValueError) as excinfo:\n        weekday(0, n=0)\n    assert str(excinfo.value) == \"Can't create weekday with n==0\"\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_rrule_L2a804980.py",
+      "usage": {
+        "prompt_tokens": 761,
+        "completion_tokens": 70,
+        "total_tokens": 831
+      }
+    },
+    {
+      "mutant_id": "e8cde621800c",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 490,
+      "operator": "ROR",
+      "description": "Equal → NotEqual",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom dateutil.rrule import rrule, YEARLY\n\ndef test_bysetpos_zero_raises():\n    with pytest.raises(ValueError):\n        rrule(YEARLY, bysetpos=0)\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_rrule_Le8cde621.py",
+      "usage": {
+        "prompt_tokens": 872,
+        "completion_tokens": 52,
+        "total_tokens": 924
+      }
+    },
+    {
+      "mutant_id": "8d6fbe2123d4",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 437,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import datetime\nfrom dateutil.rrule import rrule, DAILY\n\ndef test_kill_and_to_or_mutation():\n    # Trigger the mutated condition: until is None, but until.tzinfo would raise AttributeError\n    # Original: if until and until.tzinfo: -> False when until is None, so uses datetime.now()\n    # Mutated: if until or until.tzinfo: -> tries until.tzinfo on None, raises AttributeError\n    # But note: in the mutated code, `until or until.tzinfo` - if until is None, it evaluates\n    # `None or until.tzinfo` which tries to access .tzinfo on None -> AttributeError\n    # However, the original code with `until and until.tzinfo` - if until is None, it's False\n    # and goes to else branch. So we need to make until None to trigger the difference.\n    # But the original code also has `if not dtstart:` - if dtstart is provided, it skips this block.\n    # So we need dtstart to be falsy (None) to enter this block.\n    try:\n        rrule(DAILY, dtstart=None, until=None)\n    except AttributeError:\n        # Mutation killed: original would not raise, mutated does\n        return\n    # If no exception, original behavior (no kill)\n    raise AssertionError(\"Mutation not killed: expected AttributeError when until is None\")\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 8396,
+        "completion_tokens": 1032,
+        "total_tokens": 9428
+      }
+    },
+    {
+      "mutant_id": "0e9a7bbfd0a1",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 1202,
+      "operator": "AOR",
+      "description": "Subtract → Add",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import datetime\nfrom dateutil.rrule import rrule, YEARLY\n\ndef test_mutant_kill():\n    # Use year 2021 where the mutation changes the number of weeks in previous year\n    # Original: lyearweekday = Jan 1 2020 = Wednesday (2)\n    # Mutant: lyearweekday = Jan 1 2022 = Saturday (5)\n    \n    # For 2021: Jan 1 is Friday (4), no1wkst = (7-4+0)%7 = 3\n    # Original: lno1wkst = (7-2+0)%7 = 5 >=4 -> lno1wkst=0, lnumweeks = 52+(366+(2-0)%7)%7//4 = 52+368%7//4 = 52+4//4=53\n    # Mutant: lno1wkst = (7-5+0)%7 = 2 <4 -> lnumweeks = 52+(365-3)%7//4 = 52+362%7//4 = 52+5//4=53\n    # Both give 53, but the wnomask positions differ.\n    \n    # Instead, use year 2020 where original gives 52 weeks for 2019, mutant gives 53\n    # Original: lyearweekday = Jan 1 2019 = Tuesday (1)\n    # Mutant: lyearweekday = Jan 1 2021 = Friday (4)\n    # For 2020: Jan 1 is Wednesday (2), no1wkst = (7-2+0)%7 = 5\n    # Original: lno1wkst = (7-1+0)%7 = 6 >=4 -> lno1wkst=0, lnumweeks = 52+(365+(1-0)%7)%7//4 = 52+366%7//4 = 52+2//4=52\n    # Mutant: lno1wkst = (7-4+0)%7 = 3 <4 -> lnumweeks = 52+(366-5)%7//4 = 52+361%7//4 = 52+4//4=53\n    \n    # So for year 2020, original thinks 2019 has 52 weeks, mutant thinks 53 weeks.\n    # This affects whether days from week 53 of 2019 appear in 2020's wnomask.\n    \n    # Test with byweekno=53 (explicit week number) for year 2020\n    # Original: 2019 has no week 53, so no dates from 2019's week 53 in 2020\n    # Mutant: 2019 has week 53, so some dates in early 2020 might be included\n    \n    rule = rrule(YEARLY, byweekno=53, dtstart=datetime.datetime(2020, 1, 1), count=1)\n    dates = list(rule)\n    \n    # For original, the first date should be in December 2020 (week 53 of 2020)\n    # For mutant, it might be in January 2020 (from week 53 of 2019)\n    assert dates[0].month == 12, f\"Expected first date in December 2020, got {dates[0]}\"\n",
+      "rounds": 5,
+      "tautological_rounds": 1,
+      "usage": {
+        "prompt_tokens": 26911,
+        "completion_tokens": 6298,
+        "total_tokens": 33209
+      }
+    },
+    {
+      "mutant_id": "7c71758c67dc",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 327,
+      "operator": "COR",
+      "description": "Or → And",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom datetime import date\nfrom dateutil.relativedelta import relativedelta\n\ndef test_mutation_or_to_and():\n    rd1 = relativedelta(leapdays=0)\n    rd2 = relativedelta(leapdays=1)\n    result = rd1 + rd2\n    assert result.leapdays == 1\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_relativedelta_L7c71758c.py",
+      "usage": {
+        "prompt_tokens": 883,
+        "completion_tokens": 80,
+        "total_tokens": 963
+      }
+    },
+    {
+      "mutant_id": "1e63034974bd",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 199,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom dateutil.relativedelta import relativedelta\n\ndef test_mutation_kill():\n    with pytest.warns(DeprecationWarning) as record:\n        relativedelta(year=1.5)\n    assert len(record) == 1\n    assert \"Non-integer value passed\" in str(record[0].message)\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_relativedelta_L1e630349.py",
+      "usage": {
+        "prompt_tokens": 1100,
+        "completion_tokens": 78,
+        "total_tokens": 1178
+      }
+    },
+    {
+      "mutant_id": "a5507d14019a",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 116,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom datetime import date\nfrom dateutil.relativedelta import relativedelta\n\ndef test_mutation_kill():\n    with pytest.raises(TypeError) as excinfo:\n        relativedelta(dt1=date(2020, 1, 1), dt2=\"not a date\")\n    assert str(excinfo.value) == \"relativedelta only diffs datetime/date\"\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_relativedelta_La5507d14.py",
+      "usage": {
+        "prompt_tokens": 935,
+        "completion_tokens": 91,
+        "total_tokens": 1026
+      }
+    },
+    {
+      "mutant_id": "5eadf048acf3",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 154,
+      "operator": "ROR",
+      "description": "LessThan → LessThanEqual",
+      "arm": "directed",
+      "status": "killed",
+      "code": "from datetime import datetime, timezone, timedelta\nfrom dateutil.relativedelta import relativedelta\n\ndef test_kill_ror_less_than_equal():\n    # Two datetimes representing the same instant but with different\n    # year/month due to timezone offset crossing a month boundary.\n    # dt1: 2020-01-01 00:00 UTC\n    # dt2: 2019-12-31 19:00-05:00 (which is 2020-01-01 00:00 UTC)\n    dt1 = datetime(2020, 1, 1, 0, 0, 0, tzinfo=timezone.utc)\n    dt2 = datetime(2019, 12, 31, 19, 0, 0, \n                   tzinfo=timezone(timedelta(hours=-5)))\n    \n    # These are equal instants: dt1 == dt2 is True\n    # months = (2020-2019)*12 + (1-12) = 12 - 11 = 1\n    rd = relativedelta(dt1, dt2)\n    \n    # For original code: dt1 < dt2 is False (they're equal), \n    # so compare=operator.lt, increment=-1\n    # dtm = dt2 + 1 month = 2019-12-31 19:00-05:00 + 1 month \n    #      = 2020-01-31 19:00-05:00 = 2020-02-01 00:00 UTC\n    # while dt1 < dtm? 2020-01-01 00:00 UTC < 2020-02-01 00:00 UTC? True\n    # months += -1 -> 0, dtm = dt2 + 0 months = dt2\n    # while dt1 < dt2? False (equal), exit. months=0\n    \n    # For mutated code: dt1 <= dt2 is True (equal),\n    # so compare=operator.gt, increment=1\n    # dtm = dt2 + 1 month = same as above\n    # while dt1 > dtm? 2020-01-01 00:00 UTC > 2020-02-01 00:00 UTC? False\n    # loop doesn't run. months remains 1\n    \n    # So original gives months=0, mutated gives months=1\n    assert rd.months == 0\n    assert rd.years == 0\n    assert rd.days == 0\n    assert rd.hours == 0\n    assert rd.minutes == 0\n    assert rd.seconds == 0\n    assert rd.microseconds == 0\n",
+      "rounds": 3,
+      "tautological_rounds": 1,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_relativedelta_L5eadf048.py",
+      "usage": {
+        "prompt_tokens": 7794,
+        "completion_tokens": 4870,
+        "total_tokens": 12664
+      }
+    },
+    {
+      "mutant_id": "bb6a63708ee4",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 235,
+      "operator": "AOR",
+      "description": "Multiply → Divide",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom dateutil.relativedelta import relativedelta\n\ndef test_mutant_kill_microseconds_divide():\n    # 构造一个 microseconds 绝对值大于 999999 的 relativedelta\n    # 原代码: self.microseconds = mod * s\n    # 变异后: self.microseconds = mod / s\n    # 当 s = -1 时，原代码得到正数，变异代码得到负数\n    rd = relativedelta(microseconds=-1000001)\n    # 触发 _fix() 内部逻辑\n    # 原代码: div, mod = divmod(1000001, 1000000) => div=1, mod=1\n    # 原代码: self.microseconds = 1 * (-1) = -1\n    # 变异代码: self.microseconds = 1 / (-1) = -1.0 (浮点数)\n    # 但更关键的是，当 s = -1 且 mod 不为 0 时，除法会得到浮点数\n    # 为了明确杀死，选择 mod 不能被 s 整除的情况\n    # 例如 microseconds = -1500000 => abs=1500000\n    # divmod(1500000, 1000000) => div=1, mod=500000\n    # 原代码: 500000 * (-1) = -500000 (int)\n    # 变异代码: 500000 / (-1) = -500000.0 (float)\n    rd2 = relativedelta(microseconds=-1500000)\n    # 原代码中 microseconds 应为整数 -500000\n    # 变异代码中为浮点数 -500000.0\n    # 断言类型不同即可杀死\n    assert isinstance(rd2.microseconds, int)\n    assert rd2.microseconds == -500000\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_relativedelta_Lbb6a6370.py",
+      "usage": {
+        "prompt_tokens": 869,
+        "completion_tokens": 409,
+        "total_tokens": 1278
+      }
+    },
+    {
+      "mutant_id": "8af3c38a852e",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 285,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom unittest.mock import patch, MagicMock\nfrom dateutil.tz.win import tzwinlocal\n\ndef test_tzwinlocal_display_not_none_when_registry_has_display():\n    \"\"\"Kill mutation: tzkeyname uses None instead of TZKEYNAME, causing OpenKey to fail and display to be None.\"\"\"\n    # Create mock context managers for registry handles\n    tzlocalkey_mock = MagicMock()\n    tzkey_mock = MagicMock()\n    \n    # Setup ConnectRegistry context manager\n    connect_mock = MagicMock()\n    connect_mock.__enter__.return_value = 'handle'\n    \n    # Setup OpenKey to return different context managers for different calls\n    def openkey_side_effect(handle, key):\n        if key == 'SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\Time Zones':\n            return tzlocalkey_mock\n        else:\n            return tzkey_mock\n    \n    with patch('dateutil.tz.win.winreg.ConnectRegistry', return_value=connect_mock), \\\n         patch('dateutil.tz.win.winreg.OpenKey', side_effect=openkey_side_effect), \\\n         patch('dateutil.tz.win.valuestodict') as mock_valuestodict:\n        \n        # Mock valuestodict to return appropriate dicts\n        def fake_valuestodict(key):\n            if key == tzlocalkey_mock.__enter__.return_value:\n                return {\n                    \"StandardName\": \"Eastern Standard Time\",\n                    \"DaylightName\": \"Eastern Daylight Time\",\n                    \"Bias\": 300,\n                    \"StandardBias\": 0,\n                    \"DaylightBias\": -60,\n                    \"StandardStart\": b'\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00',\n                    \"DaylightStart\": b'\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00'\n                }\n            elif key == tzkey_mock.__enter__.return_value:\n                return {\n                    \"Display\": \"(UTC-05:00) Eastern Time (US & Canada)\"\n                }\n            else:\n                raise KeyError(f\"Unexpected key: {key}\")\n        \n        mock_valuestodict.side_effect = fake_valuestodict\n        \n        # Instantiate tzwinlocal - this will trigger the __init__ code\n        tz = tzwinlocal()\n        \n        # The mutation changes TZKEYNAME to None, which would cause OpenKey to fail\n        # and set self._display to None. In the original code, it should succeed.\n        assert tz._display is not None\n        assert tz._display == \"(UTC-05:00) Eastern Time (US & Canada)\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 13589,
+        "completion_tokens": 3141,
+        "total_tokens": 16730
+      }
+    },
+    {
+      "mutant_id": "874483a80c44",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 301,
+      "operator": "CR",
+      "description": "\"=8h\" → \"XX=8hXX\"",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import struct\nimport unittest\nfrom unittest import mock\nfrom dateutil.tz.win import tzwinlocal\n\nclass TestKillMutation(unittest.TestCase):\n    def test_kill_cr_mutation(self):\n        # Mock winreg and related functions to reach the mutated line\n        with mock.patch('dateutil.tz.win.winreg') as mock_winreg, \\\n             mock.patch('dateutil.tz.win.valuestodict') as mock_valuestodict, \\\n             mock.patch('dateutil.tz.win.tzwinlocal._get_hasdst', return_value=False):\n            \n            # Setup mock registry handles\n            mock_handle = mock.MagicMock()\n            mock_winreg.OpenKey.return_value = mock_handle\n            \n            # Mock the keydict returned by valuestodict for the main key\n            keydict = {\n                \"Bias\": 0,\n                \"StandardBias\": 0,\n                \"DaylightBias\": 0,\n                \"StandardName\": \"Standard\",\n                \"DaylightName\": \"Daylight\",\n                \"StandardStart\": struct.pack(\"=8h\", 1, 2, 3, 4, 5, 6, 7, 8),\n                \"DaylightStart\": struct.pack(\"=8h\", 1, 2, 3, 4, 5, 6, 7, 8)\n            }\n            \n            # Mock valuestodict to return keydict for the main key\n            # and a display dict for the subkey\n            def fake_valuestodict(key):\n                if key == mock_handle:\n                    return keydict\n                else:\n                    return {\"Display\": \"Test Display\"}\n            \n            mock_valuestodict.side_effect = fake_valuestodict\n            \n            # Mock the subkey context manager\n            mock_subkey = mock.MagicMock()\n            mock_winreg.OpenKey.return_value = mock_subkey\n            mock_subkey.__enter__.return_value = mock_subkey\n            mock_subkey.__exit__.return_value = False\n            \n            # Instantiate tzwinlocal - this will execute __init__\n            # The mutation changes struct.unpack format from \"=8h\" to \"XX=8hXX\"\n            # which will cause struct.error when unpacking\n            with self.assertRaises(struct.error):\n                tzwinlocal()\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 11898,
+        "completion_tokens": 2567,
+        "total_tokens": 14465
+      }
+    },
+    {
+      "mutant_id": "9e7b6ce29359",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 355,
+      "operator": "COR",
+      "description": "Or → And",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import datetime\nimport unittest\nfrom unittest.mock import patch, MagicMock\nfrom dateutil.tz.win import tzwinlocal\n\nclass TestMutationKill(unittest.TestCase):\n    def test_kill_cor_or_to_and(self):\n        # Create a mock registry key\n        mock_key = MagicMock()\n        \n        # Simulate two registry values: one REG_DWORD and one REG_DWORD_LITTLE_ENDIAN\n        # The mutation changes OR to AND, so only a value that is both would pass\n        # Since REG_DWORD and REG_DWORD_LITTLE_ENDIAN are different constants,\n        # no value can satisfy both, so the if branch will never execute.\n        # We need a REG_DWORD value with high bit set to trigger the signed conversion\n        # in the original code, but the mutated code will skip it.\n        \n        # First value: REG_DWORD with high bit set (e.g., 0x80000000 = 2147483648)\n        # In original code: dtype == REG_DWORD → True, so it converts to -2147483648\n        # In mutated code: dtype == REG_DWORD AND dtype == REG_DWORD_LITTLE_ENDIAN → False, so it skips\n        # and stores the raw unsigned value 2147483648\n        mock_enum_values = [\n            (\"DwordValue\", 0x80000000, 4),  # 4 is REG_DWORD\n            (\"SzValue\", \"test\\x00\", 1)      # 1 is REG_SZ\n        ]\n        \n        # Configure the mock key\n        mock_key.__enter__ = MagicMock(return_value=mock_key)\n        mock_key.__exit__ = MagicMock(return_value=False)\n        \n        with patch('dateutil.tz.win.winreg.QueryInfoKey', return_value=(0, 2)) as mock_qik, \\\n             patch('dateutil.tz.win.winreg.EnumValue', side_effect=mock_enum_values) as mock_ev:\n            \n            # valuestodict is a static method defined inside the class\n            # We need to find it - it might be defined as a nested function or\n            # as a class attribute. Let's inspect the class\n            # Since it's not in __dict__, it might be defined in a parent class\n            # or it might be a module-level function\n            # Let's try to find it by searching the class hierarchy\n            for cls in tzwinlocal.__mro__:\n                if 'valuestodict' in cls.__dict__:\n                    func = cls.__dict__['valuestodict']\n                    break\n            else:\n                # If not found, it might be a module-level function\n                # Let's check the module\n                import dateutil.tz.win as win_module\n                if hasattr(win_module, 'valuestodict'):\n                    func = win_module.valuestodict\n                else:\n                    raise AttributeError(\"valuestodict not found\")\n            \n            result = func(mock_key)\n            \n            # In original code, the DWORD value 0x80000000 is converted to -2147483648\n            # In mutated code, it remains 2147483648\n            # So we assert the converted (signed) value\n            self.assertEqual(result[\"DwordValue\"], -2147483648)\n            self.assertEqual(result[\"SzValue\"], \"test\")\n\nif __name__ == '__main__':\n    unittest.main()\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 12250,
+        "completion_tokens": 3135,
+        "total_tokens": 15385
+      }
+    },
+    {
+      "mutant_id": "50473e9e8b5f",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 294,
+      "operator": "AOR",
+      "description": "Subtract → Add",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import datetime\nimport struct\nfrom unittest.mock import patch\nfrom dateutil.tz.win import tzwinlocal\n\nTZLOCALKEYNAME = r\"SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation\"\nTZKEYNAME = r\"SYSTEM\\CurrentControlSet\\Control\\TimeZone\"\n\ndef mock_valuestodict(key):\n    return {\n        \"StandardName\": \"Coordinated Universal Time\",\n        \"DaylightName\": \"Coordinated Universal Time\",\n        \"Bias\": 0,\n        \"StandardBias\": 0,\n        \"DaylightBias\": 60,\n        \"Display\": \"UTC\",\n        \"StandardStart\": struct.pack(\"=8h\", 0, 1, 0, 0, 0, 0, 0, 0),\n        \"DaylightStart\": struct.pack(\"=8h\", 0, 1, 0, 0, 0, 0, 0, 0),\n    }\n\ndef test_tzwinlocal_dstoffset_mutation():\n    with patch(\"dateutil.tz.win.winreg.ConnectRegistry\") as mock_connect, \\\n         patch(\"dateutil.tz.win.winreg.OpenKey\") as mock_open, \\\n         patch(\"dateutil.tz.win.valuestodict\", side_effect=mock_valuestodict):\n        \n        mock_handle = mock_connect.return_value.__enter__.return_value\n        mock_tzlocalkey = mock_open.return_value.__enter__.return_value\n        mock_tzkey = mock_open.return_value.__enter__.return_value\n        \n        tz = tzwinlocal()\n        \n        expected_dst_offset = datetime.timedelta(minutes=-60)\n        assert tz._dst_offset == expected_dst_offset, \\\n            f\"Expected _dst_offset to be {expected_dst_offset}, got {tz._dst_offset}\"\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_win_L50473e9e.py",
+      "usage": {
+        "prompt_tokens": 2643,
+        "completion_tokens": 942,
+        "total_tokens": 3585
+      }
+    },
+    {
+      "mutant_id": "0a4c2a9b5cd0",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 764,
+      "operator": "COR",
+      "description": "Or → And",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom jinja2.nodes import _FilterTestCommon, Impossible, Const\nfrom jinja2 import Environment\nfrom jinja2.nodes import EvalContext\n\ndef test_mutant_kill():\n    env = Environment()\n    eval_ctx = EvalContext(env)\n    eval_ctx.volatile = False\n    \n    # Create a filter that exists and requires context\n    def context_filter_ignores(value, **kwargs):\n        return value + 1\n    \n    context_filter_ignores.contextfunction = True\n    env.filters['ctx_ignore'] = context_filter_ignores\n    \n    # Create a node with a simple constant\n    node = Const(42)\n    \n    # Use the actual _FilterTestCommon class via a subclass that already exists\n    # Since we can't create custom node types, we need to use an existing subclass\n    # Looking at jinja2 source, _FilterTestCommon is abstract, but we can use\n    # the actual Filter or Test classes that inherit from it\n    from jinja2.nodes import Filter\n    \n    # Create a Filter node directly\n    test_obj = Filter('ctx_ignore', node, [], [], None, None)\n    \n    # Original code: func is not None and pass_arg is context -> raises Impossible\n    # Mutant code: func is not None AND pass_arg is context -> False (because pass_arg is context, AND is False)\n    # So mutant proceeds to call func(42) which returns 43, no exception\n    # This test will pass on original (raises Impossible) and fail on mutant (no exception)\n    \n    with pytest.raises(Impossible):\n        test_obj.as_const(eval_ctx)\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\jinja_nodes_L0a4c2a9b.py",
+      "usage": {
+        "prompt_tokens": 13011,
+        "completion_tokens": 2466,
+        "total_tokens": 15477
+      }
+    },
+    {
+      "mutant_id": "f27aa269c16c",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 907,
+      "operator": "ARG",
+      "description": "get_eval_context(self, eval_ctx) → get_eval_context(None, eval_ctx)",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2.nodes import Concat, Const\nfrom jinja2 import Environment\n\ndef test_concat_as_const_kills_mutation():\n    # Create a Concat node with child Const nodes\n    node = Concat()\n    node.nodes = [Const(\"hello\"), Const(\" \"), Const(\"world\")]\n    \n    # Call as_const with an explicit eval_ctx to trigger the mutated line\n    env = Environment()\n    # Get a real EvalContext instance from the environment\n    eval_ctx = env.compile_context  # This is an EvalContext instance\n    \n    # The original code uses self (the Concat node) to get eval context,\n    # which works fine. The mutation passes None, which would cause\n    # get_eval_context to fail or return a default context that may\n    # not have the same behavior.\n    result = node.as_const(eval_ctx)\n    \n    # Assert the expected concatenated result\n    assert result == \"hello world\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 8297,
+        "completion_tokens": 1033,
+        "total_tokens": 9330
+      }
+    },
+    {
+      "mutant_id": "4006efa90fc9",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 779,
+      "operator": "CR",
+      "description": "0 → 1",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2.nodes import Filter, Const\nfrom jinja2 import Environment\n\ndef test_filter_as_const_mutation():\n    env = Environment()\n    \n    def env_checking_filter(env_arg, value):\n        if env_arg is env:\n            return value * 2\n        return value + 100\n    \n    env.filters[\"env_check\"] = env_checking_filter\n    \n    # Filter constructor doesn't accept node directly - it's set as attribute\n    filter_node = Filter()\n    filter_node.node = Const(10)\n    filter_node.name = \"env_check\"\n    filter_node.args = []\n    filter_node.kwargs = []\n    filter_node.dyn_args = None\n    filter_node.dyn_kwargs = None\n    \n    # Original: args = [env, 10] -> env_checking_filter(env, 10) -> 20\n    # Mutated: args = [10, env] -> env_checking_filter(10, env) -> 110\n    result = filter_node.as_const(eval_ctx=env.make_eval_context())\n    assert result == 20\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 9174,
+        "completion_tokens": 1317,
+        "total_tokens": 10491
+      }
+    },
+    {
+      "mutant_id": "e1983368b857",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 866,
+      "operator": "ROR",
+      "description": "NotEqual → Equal",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2.nodes import Getattr, Const\nfrom jinja2 import Environment\n\ndef test_getattr_as_const_load_ctx():\n    env = Environment()\n    # Getattr fields are (node, attr, ctx) - but constructor expects positional args\n    node = Getattr(Const(42), \"real\", \"load\")\n    # Original code: ctx != \"load\" raises Impossible, so load ctx proceeds\n    # Mutated code: ctx == \"load\" raises Impossible, so load ctx raises\n    result = node.as_const()\n    assert result == 42  # Will fail on mutated code because it raises\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 7199,
+        "completion_tokens": 683,
+        "total_tokens": 7882
+      }
+    },
+    {
+      "mutant_id": "4d6b6ab69f34",
+      "project": "jinja",
+      "module": "environment.py",
+      "line": 89,
+      "operator": "ROR",
+      "description": "LessThan → LessThanEqual",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom jinja2.environment import create_cache\n\ndef test_create_cache_distinguishes_zero():\n    # The key insight: the first condition checks `size == 0`.\n    # For a normal integer 0, this is True and returns None before reaching the mutated line.\n    # But what if we pass a value where `size == 0` is False, yet `size <= 0` is True?\n    # This is impossible for standard numbers, but we can craft a custom object.\n    \n    class ZeroLike:\n        def __eq__(self, other):\n            # Make size == 0 return False, so we skip the first if\n            return False\n        def __lt__(self, other):\n            # For size < 0: return False (so original would not return {})\n            return False\n        def __le__(self, other):\n            # For size <= 0: return True (so mutant would return {})\n            return True\n    \n    # Original code: size == 0 is False, size < 0 is False -> goes to LRUCache\n    # Mutant code: size == 0 is False, size <= 0 is True -> returns {}\n    # This should kill the mutant!\n    \n    result = create_cache(ZeroLike())\n    # Original returns LRUCache, mutant returns {}\n    # We assert it's an LRUCache (original behavior)\n    from jinja2.utils import LRUCache\n    assert isinstance(result, LRUCache)\n",
+      "rounds": 3,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\jinja_environment_L4d6b6ab6.py",
+      "usage": {
+        "prompt_tokens": 5836,
+        "completion_tokens": 1658,
+        "total_tokens": 7494
+      }
+    },
+    {
+      "mutant_id": "8a71cded172c",
+      "project": "jinja",
+      "module": "environment.py",
+      "line": 678,
+      "operator": "ARG",
+      "description": "TokenStream(stream, name, filename) → TokenStream(None, name, filename)",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2 import Environment\nfrom jinja2.lexer import TokenStream\n\nclass BadExtension:\n    identifier = \"bad_extension\"\n    priority = 0\n\n    def __init__(self, environment):\n        self.environment = environment\n\n    def preprocess(self, source, name, filename=None):\n        return source\n\n    def filter_stream(self, stream):\n        # Return a plain list instead of TokenStream\n        return list(stream)\n\ndef test_mutation_kill_tokenstream_arg():\n    env = Environment(extensions=[BadExtension])\n    with pytest.raises(TypeError):\n        env.parse(\"{{ 1 + 1 }}\")\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 7432,
+        "completion_tokens": 682,
+        "total_tokens": 8114
+      }
+    },
+    {
+      "mutant_id": "d7865134dca7",
+      "project": "jinja",
+      "module": "environment.py",
+      "line": 815,
+      "operator": "CR",
+      "description": "1 → 2",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2.environment import Environment\n\ndef test_compile_expression_lineno_mutation():\n    env = Environment()\n    # Compile a simple expression that won't raise errors\n    result = env.compile_expression('1 + 1')\n    # The TemplateExpression wraps a compiled template\n    # We need to inspect the template's internal structure to find the lineno\n    # The template is stored in the expression object\n    template = result._template\n    # The template has a `_compiled_code` attribute after compilation\n    # But we haven't compiled it yet, so let's force compilation\n    # We can call the template's `_get_default_module` or similar\n    # Actually, let's use the template's `new_context` or render\n    # But we don't want to render, we want to inspect the code\n    # Let's use the environment's `compile` method directly\n    # The template object has a `_compile` method that returns code\n    # Let's try to access it\n    # In Jinja2, the Template object has a `_compile` method\n    # that returns the compiled code object\n    # Let's check if it exists\n    if hasattr(template, '_compile'):\n        code = template._compile(template, template.filename)\n        # Now we can inspect the code's line numbers\n        import dis\n        line_numbers = []\n        for instr in dis.get_instructions(code):\n            if instr.starts_line is not None:\n                line_numbers.append(instr.starts_line)\n        # The first line number should be 1 in original, 2 in mutated\n        assert line_numbers[0] == 1, f\"Expected first line 1, got {line_numbers[0]}\"\n    else:\n        # Alternative approach: check the template's source\n        # The template was created from nodes.Template with lineno=1 or 2\n        # We can access the template's `body` through its internal attributes\n        # Let's check what attributes are available\n        # The Template object has a `_template` attribute that might help\n        # Let's just check that the expression works correctly\n        assert result() == 2\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 9674,
+        "completion_tokens": 2541,
+        "total_tokens": 12215
+      }
+    },
+    {
+      "mutant_id": "c5818c67ed4b",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 43,
+      "operator": "CR",
+      "description": "\"<marshmallow.missing>\" → \"XX<marshmallow.missing>XX\"",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom marshmallow.utils import _Missing\n\ndef test_missing_repr():\n    missing = _Missing()\n    assert repr(missing) == \"<marshmallow.missing>\"\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_utils_Lc5818c67.py",
+      "usage": {
+        "prompt_tokens": 808,
+        "completion_tokens": 45,
+        "total_tokens": 853
+      }
+    },
+    {
+      "mutant_id": "04b22a9dfd0b",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 345,
+      "operator": "COR",
+      "description": "Or → And",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import functools\nfrom marshmallow.utils import get_func_args\n\ndef test_get_func_args_with_callable_class():\n    class CallableClass:\n        def __call__(self, a, b):\n            pass\n\n    callable_obj = CallableClass()\n    result = get_func_args(callable_obj)\n    assert result == [\"a\", \"b\"]\n",
+      "rounds": 5,
+      "tautological_rounds": 2,
+      "usage": {
+        "prompt_tokens": 25126,
+        "completion_tokens": 8214,
+        "total_tokens": 33340
+      }
+    },
+    {
+      "mutant_id": "fa7ee8275005",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 183,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom marshmallow.utils import from_iso_time\n\ndef test_from_iso_time_invalid_raises_valueerror_with_message():\n    with pytest.raises(ValueError) as excinfo:\n        from_iso_time(\"not-a-valid-time\")\n    assert str(excinfo.value) == \"Not a valid ISO8601-formatted time string\"\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_utils_Lfa7ee827.py",
+      "usage": {
+        "prompt_tokens": 867,
+        "completion_tokens": 81,
+        "total_tokens": 948
+      }
+    },
+    {
+      "mutant_id": "260c2fd02673",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 166,
+      "operator": "ROR",
+      "description": "GreaterThan → GreaterThanEqual",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom marshmallow.utils import from_iso_datetime\n\ndef test_from_iso_datetime_mutation_kill():\n    # Trigger the mutated line with a timezone offset string of length 3\n    # e.g., \"+01\" (sign + 2 digits) - len(tzinfo) == 3\n    # Original: len(tzinfo) > 3 is False -> offset_mins = 0\n    # Mutated: len(tzinfo) >= 3 is True -> offset_mins = int(\"01\") = 1\n    # This changes the resulting offset from 60 to 61 minutes\n    result = from_iso_datetime(\"2023-01-01T00:00:00+01\")\n    # Original would produce +01:00, mutated produces +01:01\n    assert result.utcoffset().total_seconds() == 3600  # 1 hour\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_utils_L260c2fd0.py",
+      "usage": {
+        "prompt_tokens": 2310,
+        "completion_tokens": 408,
+        "total_tokens": 2718
+      }
+    },
+    {
+      "mutant_id": "047c73dbc2a7",
+      "project": "marshmallow",
+      "module": "validate.py",
+      "line": 625,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.exceptions import ValidationError\nfrom marshmallow.validate import OneOf\n\ndef test_oneof_type_error_raises_validation_error_with_message():\n    validator = OneOf(choices=[1, 2, 3])\n    # This value will cause a TypeError when checking membership\n    # because list is unhashable and comparison with ints raises TypeError\n    value = []\n    with pytest.raises(ValidationError) as excinfo:\n        validator(value)\n    # Original code: error message is a non-empty string containing formatted choices\n    # Mutated code: error message is None\n    assert excinfo.value.messages is not None\n    assert isinstance(excinfo.value.messages, list)\n    assert len(excinfo.value.messages) == 1\n    assert isinstance(excinfo.value.messages[0], str)\n    assert excinfo.value.messages[0] != \"None\"\n    assert \"1, 2, 3\" in excinfo.value.messages[0]\n    assert \"Must be one of\" in excinfo.value.messages[0]\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 8903,
+        "completion_tokens": 965,
+        "total_tokens": 9868
+      }
+    },
+    {
+      "mutant_id": "debf2e58ea1c",
+      "project": "marshmallow",
+      "module": "validate.py",
+      "line": 199,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom marshmallow.validate import URL\n\ndef test_url_validation_rejects_both_relative_and_absolute_false():\n    with pytest.raises(ValueError) as excinfo:\n        URL(relative=False, absolute=False)\n    assert str(excinfo.value) == \"URL validation cannot set both relative and absolute to False.\"\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_validate_Ldebf2e58.py",
+      "usage": {
+        "prompt_tokens": 779,
+        "completion_tokens": 76,
+        "total_tokens": 855
+      }
+    },
+    {
+      "mutant_id": "30cbb0be2367",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 223,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom marshmallow.schema import SchemaOpts\n\ndef test_schema_opts_raises_when_both_fields_and_additional_set():\n    class Meta:\n        fields = (\"name\",)\n        additional = (\"age\",)\n\n    with pytest.raises(ValueError, match=\"Cannot set both `fields` and `additional` options for the same Schema.\"):\n        SchemaOpts(Meta)\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_schema_L30cbb0be.py",
+      "usage": {
+        "prompt_tokens": 929,
+        "completion_tokens": 91,
+        "total_tokens": 1020
+      }
+    },
+    {
+      "mutant_id": "64d08d707ccf",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 221,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom marshmallow.schema import SchemaOpts\n\ndef test_schema_opts_additional_invalid_type_raises_value_error():\n    class Meta:\n        additional = \"not_a_list_or_tuple\"\n    \n    with pytest.raises(ValueError) as excinfo:\n        SchemaOpts(Meta)\n    \n    assert str(excinfo.value) == \"`additional` option must be a list or tuple.\"\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_schema_L64d08d70.py",
+      "usage": {
+        "prompt_tokens": 944,
+        "completion_tokens": 93,
+        "total_tokens": 1037
+      }
+    },
+    {
+      "mutant_id": "9cf1cf976618",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 985,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom marshmallow import Schema, fields, post_load\nfrom marshmallow.exceptions import ValidationError\n\nclass MySchema(Schema):\n    x = fields.Int(required=True)\n\n    @post_load\n    def process(self, data, **kwargs):\n        data['processed'] = True\n        return data\n\ndef test_mutant_kill_post_load_not_called_when_errors_and_no_hooks():\n    schema = MySchema()\n    # This input will cause a validation error (missing required field 'x')\n    # Original: if not errors and postprocess and self._hooks[POST_LOAD]:\n    #   - errors is non-empty -> condition False -> post_load NOT called\n    # Mutant: if not errors and postprocess or self._hooks[POST_LOAD]:\n    #   - errors is non-empty, but self._hooks[POST_LOAD] is truthy (has post_load)\n    #   -> condition True -> post_load IS called (but it shouldn't be)\n    with pytest.raises(ValidationError) as exc_info:\n        schema.load({})\n    # The post_load should NOT have been called, so 'processed' should not be in valid_data\n    assert 'processed' not in exc_info.value.valid_data\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\marshmallow_schema_L9cf1cf97.py",
+      "usage": {
+        "prompt_tokens": 737,
+        "completion_tokens": 268,
+        "total_tokens": 1005
+      }
+    },
+    {
+      "mutant_id": "542707b3536b",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 1101,
+      "operator": "ROR",
+      "description": "GreaterThan → GreaterThanEqual",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow import Schema, fields\n\nclass TestSchemaMutationKill:\n    def test_kill_ror_mutation(self):\n        # Create a schema with NO duplicate attributes\n        # Original code: no error raised\n        # Mutated code: raises ValueError because count >= 1 for every attribute\n        class NoDuplicateSchema(Schema):\n            field1 = fields.String(attribute=\"attr1\")\n            field2 = fields.String(attribute=\"attr2\")\n\n        # Original code: no error raised\n        # Mutated code: raises ValueError\n        # We assert that no exception is raised - this passes on original\n        # and fails on mutated because mutated raises ValueError\n        NoDuplicateSchema()\n        \n        # Additional check to ensure schema was properly initialized\n        schema = NoDuplicateSchema()\n        assert schema.load_fields is not None\n        assert schema.dump_fields is not None\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 9355,
+        "completion_tokens": 1307,
+        "total_tokens": 10662
+      }
+    },
+    {
+      "mutant_id": "85638372911b",
+      "project": "attrs",
+      "module": "validators.py",
+      "line": 495,
+      "operator": "CR",
+      "description": "\">\" → \"XX>XX\"",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import operator\nimport pytest\nfrom attr.validators import _NumberValidator\n\ndef test_gt_mutation_kill():\n    validator = _NumberValidator(10, \">\", operator.gt)\n    # 直接检查内部属性，原代码为 \">\"，变异后为 \"XX>XX\"\n    # 通过 __dict__ 访问实例属性\n    assert validator.__dict__['_NumberValidator__compare_op'] == \">\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6346,
+        "completion_tokens": 440,
+        "total_tokens": 6786
+      }
+    },
+    {
+      "mutant_id": "25c899ce4570",
+      "project": "attrs",
+      "module": "validators.py",
+      "line": 465,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom attr.validators import _NumberValidator\n\ndef test_le_mutation_kill():\n    validator = _NumberValidator(10, \"<=\", lambda x, y: x <= y)\n    # 验证正常行为\n    validator(None, None, 5)  # 5 <= 10 应该通过\n    with pytest.raises(ValueError):\n        validator(None, None, 15)  # 15 > 10 应该失败\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6468,
+        "completion_tokens": 495,
+        "total_tokens": 6963
+      }
+    },
+    {
+      "mutant_id": "a48fe4ce307b",
+      "project": "click",
+      "module": "types.py",
+      "line": 392,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom click.types import DateTime\nfrom click.exceptions import BadParameter\n\ndef test_datetime_convert_error_message_uses_original_value():\n    dt = DateTime()\n    with pytest.raises(BadParameter) as excinfo:\n        dt.convert(\"not-a-date\", None, None)\n    assert \"not-a-date\" in str(excinfo.value)\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\click_types_La48fe4ce.py",
+      "usage": {
+        "prompt_tokens": 784,
+        "completion_tokens": 82,
+        "total_tokens": 866
+      }
+    },
+    {
+      "mutant_id": "b9c243addb8a",
+      "project": "click",
+      "module": "types.py",
+      "line": 393,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.types import DateTime\nfrom click.exceptions import BadParameter\n\ndef test_datetime_convert_error_message_mutation():\n    dt = DateTime()\n    with pytest.raises(BadParameter) as excinfo:\n        dt.convert(\"invalid-date\", None, None)\n    error_message = str(excinfo.value)\n    # 原代码消息以单引号开头，变异代码以 \"XX\" 开头\n    assert error_message[0] == \"'\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6928,
+        "completion_tokens": 532,
+        "total_tokens": 7460
+      }
+    },
+    {
+      "mutant_id": "21c401c8bdff",
+      "project": "click",
+      "module": "types.py",
+      "line": 865,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.types import Path\nfrom click.core import Parameter, Context\nfrom click import Command\n\nclass TestPathConvertMutation:\n    def test_kill_and_to_or_mutation(self):\n        # Create a Path instance with file_okay=True and allow_dash=False\n        # This makes the original condition `file_okay and allow_dash and rv in (b\"-\", \"-\")` False\n        # But the mutated condition `file_okay and allow_dash or rv in (b\"-\", \"-\")` will be True\n        # because rv == \"-\" makes the second part True\n        path_type = Path(file_okay=True, allow_dash=False)\n        \n        # Create a dummy parameter and context\n        param = Parameter()\n        ctx = Context(Command(\"test\"))\n        \n        # Call convert with value \"-\"\n        # Original: is_dash = True and False and True = False -> will try to stat \"-\"\n        # Mutated: is_dash = True and False or True = True -> will skip stat and return \"-\"\n        result = path_type.convert(\"-\", param, ctx)\n        \n        # The original code would raise a \"does not exist\" error because it tries to stat \"-\"\n        # The mutated code returns \"-\" directly without checking existence\n        # So we assert that the result is \"-\" which only happens with the mutation\n        assert result == \"-\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 8990,
+        "completion_tokens": 1525,
+        "total_tokens": 10515
+      }
+    },
+    {
+      "mutant_id": "e13aab1489b9",
+      "project": "click",
+      "module": "parser.py",
+      "line": 85,
+      "operator": "ROR",
+      "description": "GreaterThan → GreaterThanEqual",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.parser import OptionParser, Option\n\ndef test_mutation_ror_greater_than_to_greater_than_equal():\n    # 使用公开的 OptionParser 类\n    parser = OptionParser()\n    \n    # 添加一个 nargs=1 的参数和一个 nargs=2 的参数\n    # Option 需要 opts 和 dest 参数\n    parser.add_option(Option([\"--opt1\"], dest=\"opt1\", nargs=1))\n    parser.add_option(Option([\"--opt2\"], dest=\"opt2\", nargs=2))\n    \n    # 构造命令行参数\n    args = [\"--opt1\", \"val1\", \"--opt2\", \"val2\", \"val3\"]\n    \n    # 解析参数\n    result = parser.parse_args(args)\n    \n    # 验证结果\n    assert result[\"opt1\"] == \"val1\"\n    assert result[\"opt2\"] == (\"val2\", \"val3\")\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 9108,
+        "completion_tokens": 1192,
+        "total_tokens": 10300
+      }
+    },
+    {
+      "mutant_id": "acba36d2f921",
+      "project": "click",
+      "module": "parser.py",
+      "line": 146,
+      "operator": "CR",
+      "description": "\"\" → \"XXXX\"",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom click.parser import split_arg_string\n\ndef test_split_arg_string_commenter_mutation():\n    # Original: commenters = \"\" (no comment stripping)\n    # Mutated: commenters = \"XXXX\" (treats X as comment start)\n    result = split_arg_string(\"hello Xworld\")\n    assert result == [\"hello\", \"Xworld\"]\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\click_parser_Lacba36d2.py",
+      "usage": {
+        "prompt_tokens": 724,
+        "completion_tokens": 82,
+        "total_tokens": 806
+      }
+    },
+    {
+      "mutant_id": "4c6f4c9c5c0f",
+      "project": "click",
+      "module": "parser.py",
+      "line": 475,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom click.parser import OptionParser, ParsingState\nfrom click.exceptions import BadOptionUsage\nfrom click.parser import Option\n\n\nclass FakeOptionObj:\n    _flag_needs_value = False\n\n\nclass FakeOption:\n    def __init__(self):\n        self.nargs = 2\n        self.obj = FakeOptionObj()\n\n\ndef test_mutation_arg_option_name_none():\n    parser = OptionParser()\n    option = FakeOption()\n    state = ParsingState(rargs=[])  # fewer args than nargs\n\n    with pytest.raises(BadOptionUsage) as excinfo:\n        parser._get_value_from_state(\"--test-option\", option, state)\n\n    # The original code formats with name=option_name, so the message contains\n    # the actual option name. The mutated code uses name=None, which would\n    # produce \"Option None requires...\" instead of \"Option '--test-option' requires...\"\n    assert \"--test-option\" in str(excinfo.value)\n",
+      "rounds": 2,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\click_parser_L4c6f4c9c.py",
+      "usage": {
+        "prompt_tokens": 2010,
+        "completion_tokens": 437,
+        "total_tokens": 2447
+      }
+    },
+    {
+      "mutant_id": "e2964dca6ef9",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 364,
+      "operator": "CR",
+      "description": "\"COMP_WORDS\" → \"XXCOMP_WORDSXX\"",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import os\nimport click\nfrom click.shell_completion import ZshComplete\nfrom click.testing import CliRunner\n\ndef test_get_completion_args_kill_mutation():\n    os.environ[\"COMP_WORDS\"] = \"prog --flag value\"\n    os.environ[\"COMP_CWORD\"] = \"2\"\n\n    @click.command()\n    @click.option(\"--flag\")\n    def cli(flag):\n        pass\n\n    runner = CliRunner()\n    with runner.isolated_filesystem():\n        ctx = cli.make_context(\"prog\", [\"--flag\", \"value\"])\n        zsh_complete = ZshComplete(cli, ctx, \"prog\", \"COMP_WORDS\")\n        args, incomplete = zsh_complete.get_completion_args()\n        assert args == [\"--flag\"]\n        assert incomplete == \"value\"\n",
+      "rounds": 4,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\click_shell_completion_Le2964dca.py",
+      "usage": {
+        "prompt_tokens": 5854,
+        "completion_tokens": 797,
+        "total_tokens": 6651
+      }
+    },
+    {
+      "mutant_id": "6ce715a7c280",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 541,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "suspected_equivalent",
+      "code": "import click\nfrom click.testing import CliRunner\n\ndef test_mutation_arg_kill():\n    @click.group(chain=True)\n    def cli():\n        pass\n\n    @cli.command()\n    @click.option('--name', required=True)\n    def sub1(name):\n        click.echo(f\"sub1:{name}\")\n\n    @cli.command()\n    @click.option('--value', required=True)\n    def sub2(value):\n        click.echo(f\"sub2:{value}\")\n\n    runner = CliRunner()\n    # Chain two commands that both require options\n    # The original code passes the command name to make_context, so the\n    # option parsing works correctly for each chained command.\n    # The mutation passes None, which will cause the option to be\n    # misinterpreted or cause an error.\n    result = runner.invoke(cli, [\"sub1\", \"--name\", \"hello\", \"sub2\", \"--value\", \"world\"], prog_name=\"cli\")\n    assert result.exit_code == 0\n    assert result.output == \"sub1:hello\\nsub2:world\\n\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 7529,
+        "completion_tokens": 952,
+        "total_tokens": 8481
+      }
+    },
+    {
+      "mutant_id": "68b964b30438",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 476,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "directed",
+      "status": "killed",
+      "code": "import pytest\nfrom dateutil.rrule import rrule\nfrom dateutil.rrule import DAILY\n\ndef test_mutation_kill_count_until_warning():\n    with pytest.warns(DeprecationWarning) as record:\n        rrule(DAILY, count=1, until=__import__('datetime').datetime(2020, 1, 1))\n    assert len(record) == 1\n    assert \"inconsistent with RFC 5545\" in str(record[0].message)\n",
+      "rounds": 1,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_rrule_L68b964b3.py",
+      "usage": {
+        "prompt_tokens": 1176,
+        "completion_tokens": 111,
+        "total_tokens": 1287
+      }
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "attrs": {
+    "high_coverage_threshold": 85.0,
+    "median_assert_density": 51.61,
+    "counts": {
+      "A_高覆盖_弱断言": 2,
+      "B_高覆盖_强断言": 3,
+      "C_低覆盖_弱断言": 0,
+      "D_低覆盖_强断言": 0
+    },
+    "n_modules": 5,
+    "a_modules": [
+      {
+        "module": "validators.py",
+        "ncloc": 305,
+        "pct": 100.0,
+        "density": 30.82
+      },
+      {
+        "module": "_funcs.py",
+        "ncloc": 256,
+        "pct": 100.0,
+        "density": 16.02
+      }
+    ]
+  },
+  "click": {
+    "high_coverage_threshold": 85.0,
+    "median_assert_density": 13.27,
+    "counts": {
+      "A_高覆盖_弱断言": 4,
+      "B_高覆盖_强断言": 3,
+      "C_低覆盖_弱断言": 2,
+      "D_低覆盖_强断言": 4
+    },
+    "n_modules": 13,
+    "a_modules": [
+      {
+        "module": "types.py",
+        "ncloc": 618,
+        "pct": 89.59,
+        "density": 12.62
+      },
+      {
+        "module": "shell_completion.py",
+        "ncloc": 365,
+        "pct": 89.5,
+        "density": 6.85
+      },
+      {
+        "module": "formatting.py",
+        "ncloc": 190,
+        "pct": 96.38,
+        "density": 12.63
+      },
+      {
+        "module": "exceptions.py",
+        "ncloc": 176,
+        "pct": 89.76,
+        "density": 7.95
+      }
+    ]
+  },
+  "dateutil": {
+    "high_coverage_threshold": 85.0,
+    "median_assert_density": 30.43,
+    "counts": {
+      "A_高覆盖_弱断言": 2,
+      "B_高覆盖_强断言": 3,
+      "C_低覆盖_弱断言": 2,
+      "D_低覆盖_强断言": 1
+    },
+    "n_modules": 8,
+    "a_modules": [
+      {
+        "module": "rrule.py",
+        "ncloc": 1203,
+        "pct": 94.18,
+        "density": 28.43
+      },
+      {
+        "module": "tz/win.py",
+        "ncloc": 186,
+        "pct": 87.5,
+        "density": 16.67
+      }
+    ]
+  },
+  "jinja": {
+    "high_coverage_threshold": 85.0,
+    "median_assert_density": 11.145,
+    "counts": {
+      "A_高覆盖_弱断言": 6,
+      "B_高覆盖_强断言": 9,
+      "C_低覆盖_弱断言": 3,
+      "D_低覆盖_强断言": 0
+    },
+    "n_modules": 18,
+    "a_modules": [
+      {
+        "module": "filters.py",
+        "ncloc": 882,
+        "pct": 90.64,
+        "density": 0.79
+      },
+      {
+        "module": "loaders.py",
+        "ncloc": 378,
+        "pct": 86.62,
+        "density": 10.58
+      },
+      {
+        "module": "tests.py",
+        "ncloc": 106,
+        "pct": 96.97,
+        "density": 0.0
+      },
+      {
+        "module": "exceptions.py",
+        "ncloc": 82,
+        "pct": 90.91,
+        "density": 6.1
+      },
+      {
+        "module": "nativetypes.py",
+        "ncloc": 81,
+        "pct": 90.91,
+        "density": 1.23
+      },
+      {
+        "module": "async_utils.py",
+        "ncloc": 63,
+        "pct": 98.25,
+        "density": 3.17
+      }
+    ]
+  },
+  "marshmallow": {
+    "high_coverage_threshold": 85.0,
+    "median_assert_density": 100.25,
+    "counts": {
+      "A_高覆盖_弱断言": 2,
+      "B_高覆盖_强断言": 2,
+      "C_低覆盖_弱断言": 0,
+      "D_低覆盖_强断言": 1
+    },
+    "n_modules": 5,
+    "a_modules": [
+      {
+        "module": "schema.py",
+        "ncloc": 857,
+        "pct": 99.13,
+        "density": 89.38
+      },
+      {
+        "module": "utils.py",
+        "ncloc": 203,
+        "pct": 96.05,
+        "density": 87.68
+      }
+    ]
+  }
+}

@@ -1,0 +1,736 @@
+{
+  "model": "deepseek-v4-flash",
+  "arm": "blind",
+  "n": 40,
+  "status_count": {
+    "suspected_equivalent": 39,
+    "killed": 1
+  },
+  "compile_pass_rate": 100.0,
+  "kill_rate": 2.5,
+  "avg_rounds_killed": 4.0,
+  "cheat_rate": 0.5025125628140703,
+  "results": [
+    {
+      "mutant_id": "d00a8fdaa284",
+      "project": "attrs",
+      "module": "validators.py",
+      "line": 182,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom attr.validators import instance_of\nfrom attr import attrs, attrib\n\n@attrs\nclass MyClass:\n    x = attrib()\n\ndef test_instance_of_with_subclass_instance():\n    class SubClass(MyClass):\n        pass\n    \n    validator = instance_of(MyClass)\n    obj = SubClass(x=1)\n    \n    # Should pass without raising for a subclass instance\n    validator(obj, obj.__attrs_attrs__[0], obj)\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 3682,
+        "completion_tokens": 417,
+        "total_tokens": 4099
+      }
+    },
+    {
+      "mutant_id": "8607eccf3b2d",
+      "project": "click",
+      "module": "types.py",
+      "line": 391,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.types import IntRange\n\ndef test_int_range_with_invalid_input_types():\n    \"\"\"Test IntRange with various invalid input types that should raise errors.\"\"\"\n    r = IntRange(min=0, max=10)\n    \n    # Test with None input\n    with pytest.raises(Exception):\n        r.convert(None, None, None)\n    \n    # Test with empty string\n    with pytest.raises(Exception):\n        r.convert(\"\", None, None)\n    \n    # Test with non-numeric string\n    with pytest.raises(Exception):\n        r.convert(\"abc\", None, None)\n    \n    # Test with float that is not an integer\n    with pytest.raises(Exception):\n        r.convert(\"5.5\", None, None)\n    \n    # Test with hexadecimal string\n    with pytest.raises(Exception):\n        r.convert(\"0x10\", None, None)\n\ndef test_int_range_with_very_large_values():\n    \"\"\"Test IntRange with very large integer values.\"\"\"\n    r = IntRange(min=0, max=10)\n    \n    # Test with very large positive number\n    with pytest.raises(Exception):\n        r.convert(\"99999999999999999999999999\", None, None)\n    \n    # Test with very large negative number\n    with pytest.raises(Exception):\n        r.convert(\"-99999999999999999999999999\", None, None)\n\ndef test_int_range_with_unicode_digits():\n    \"\"\"Test IntRange with unicode digit characters.\"\"\"\n    r = IntRange(min=0, max=10)\n    \n    # Test with Arabic-Indic digits\n    with pytest.raises(Exception):\n        r.convert(\"٥\", None, None)  # Arabic-Indic digit 5\n    \n    # Test with full-width digits\n    with pytest.raises(Exception):\n        r.convert(\"５\", None, None)  # Full-width digit 5\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 8715,
+        "completion_tokens": 1951,
+        "total_tokens": 10666
+      }
+    },
+    {
+      "mutant_id": "06a24fd91cee",
+      "project": "click",
+      "module": "parser.py",
+      "line": 488,
+      "operator": "ROR",
+      "description": "GreaterThan → GreaterThanEqual",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.parser import OptionParser, Option, Argument\n\ndef test_parser_line_488_mutation():\n    parser = OptionParser()\n    parser.add_option(Option(['--foo'], 'foo', 'foo', nargs=1))\n    parser.add_argument(Argument(['bar'], 'bar', 'bar', nargs=1))\n\n    # 构造一个同时包含选项和位置参数的命令行\n    args = ['--foo', 'value', 'positional']\n    opts, positional = parser.parse_args(args)\n\n    # 验证选项和位置参数都被正确解析\n    assert opts['foo'] == 'value'\n    assert positional == ['positional']\n\n    # 再测试一个只有位置参数的情况，确保选项解析逻辑不受影响\n    args2 = ['only_positional']\n    opts2, positional2 = parser.parse_args(args2)\n    assert 'foo' not in opts2\n    assert positional2 == ['only_positional']\n\n    # 测试选项参数缺失的情况（可能触发第488行附近的错误处理逻辑）\n    with pytest.raises(Exception):\n        parser.parse_args(['--foo'])  # 缺少选项值\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 5911,
+        "completion_tokens": 1204,
+        "total_tokens": 7115
+      }
+    },
+    {
+      "mutant_id": "6d6e1b0a3030",
+      "project": "click",
+      "module": "parser.py",
+      "line": 438,
+      "operator": "ARG",
+      "description": "NoSuchOption(opt, ctx=self.ctx) → NoSuchOption(None, ctx=self.ctx)",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.parser import OptionParser, ParsingState\n\ndef test_parser_line_438_mutation():\n    # Create an OptionParser with a single option\n    parser = OptionParser()\n    parser.add_option('-o', '--output', 'output')\n    \n    # Create a ParsingState\n    state = ParsingState()\n    \n    # Simulate parsing arguments that would trigger the code at line 438\n    # The line is likely in the _match_long_opt or _match_short_opt logic\n    # We'll test with a long option that has a value\n    args = ['--output', 'test.txt']\n    \n    # Call the internal parsing method that processes the args\n    # This should invoke the code at line 438\n    result = parser._process_args_for_options(state, args)\n    \n    # Assert that the option was correctly parsed\n    assert state.opts['output'] == 'test.txt'\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 5738,
+        "completion_tokens": 1026,
+        "total_tokens": 6764
+      }
+    },
+    {
+      "mutant_id": "1ffacaf9f4e1",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 536,
+      "operator": "ARG",
+      "description": "command.resolve_command(ctx, args) → command.resolve_command(None, args)",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import os\nimport tempfile\nfrom click.shell_completion import CompletionItem\nfrom click.shell_completion import ShellComplete\n\nclass MyShellComplete(ShellComplete):\n    name = \"test\"\n    def source(self):\n        return [CompletionItem(\"foo\"), CompletionItem(\"bar\")]\n\ndef test_shell_complete_completion_items():\n    tmpdir = tempfile.mkdtemp()\n    try:\n        old_cwd = os.getcwd()\n        os.chdir(tmpdir)\n        try:\n            comp = MyShellComplete(cli=None, prog_name=\"test\", complete_var=\"_TEST_COMPLETE\", ctx_args={})\n            items = comp.get_completion_args()\n            # The mutation is likely in the logic that determines whether to include\n            # the program name as the first argument. We test that the completion\n            # args correctly include the program name when it's the first word.\n            assert items[0] == \"test\" or items[0] == \"\"\n        finally:\n            os.chdir(old_cwd)\n    finally:\n        # Clean up without using shutil.rmtree which may have permission issues on Windows\n        try:\n            os.rmdir(tmpdir)\n        except OSError:\n            pass\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6128,
+        "completion_tokens": 1151,
+        "total_tokens": 7279
+      }
+    },
+    {
+      "mutant_id": "8592b3b13da2",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 462,
+      "operator": "ROR",
+      "description": "GreaterThan → GreaterThanEqual",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.shell_completion import CompletionItem\n\ndef test_completion_item_help_text_behavior():\n    item = CompletionItem(name=\"test\", value=\"test_value\", help=\"help text\")\n    # 测试 help 属性是否被正确存储\n    assert item.help == \"help text\"\n    # 测试 help 属性是否与 name 和 value 不同\n    assert item.help != item.name\n    assert item.help != item.value\n    # 测试 help 属性是否包含特定子串\n    assert \"help\" in item.help\n    # 测试 help 属性是否以特定字符开头\n    assert item.help.startswith(\"help\")\n    # 测试 help 属性是否以特定字符结尾\n    assert item.help.endswith(\"text\")\n    # 测试 help 属性是否可迭代且长度正确\n    assert len(item.help) == 9\n    # 测试 help 属性是否可哈希\n    hash(item.help)\n    # 测试 help 属性是否可比较\n    assert item.help == \"help text\"\n    assert item.help >= \"help\"\n    assert item.help <= \"help text\"\n    # 测试 help 属性是否与 value 不同\n    assert item.help != item.value\n    # 测试 help 属性是否与 name 不同\n    assert item.help != item.name\n    # 测试 help 属性是否与 name 和 value 的组合不同\n    assert item.help != item.name + item.value\n    # 测试 help 属性是否与 value 和 name 的组合不同\n    assert item.help != item.value + item.name\n    # 测试 help 属性是否与 name 和 value 的拼接不同\n    assert item.help != f\"{item.name}{item.value}\"\n    # 测试 help 属性是否与 value 和 name 的拼接不同\n    assert item.help != f\"{item.value}{item.name}\"\n    # 测试 help 属性是否与 name 和 value 的格式化不同\n    assert item.help != f\"{item.name}-{item.value}\"\n    # 测试 help 属性是否与 value 和 name 的格式化不同\n    assert item.help != f\"{item.value}-{item.name}\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 4157,
+        "completion_tokens": 1013,
+        "total_tokens": 5170
+      }
+    },
+    {
+      "mutant_id": "e8cde621800c",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 490,
+      "operator": "ROR",
+      "description": "Equal → NotEqual",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import datetime\nfrom dateutil.rrule import rrule, WEEKLY, MO, TU, WE, TH, FR, SA, SU\n\ndef test_rrule_line_490_mutation():\n    # 使用 WEEKLY 频率和 byweekday 参数，触发 rrule 内部对星期计算的特定分支\n    # 原代码在计算下一周时会正确处理跨年情况，变异后可能产生错误\n    start = datetime(2023, 12, 31, 0, 0, 0)  # 2023-12-31 是星期日\n    \n    # 使用 WEEKLY 频率，byweekday=MO（星期一）\n    # 从星期日开始，下一个星期一是2024-01-01，触发跨年逻辑\n    rule = rrule(WEEKLY, dtstart=start, byweekday=MO, count=3)\n    \n    instances = list(rule)\n    \n    # 验证第一个实例：2024-01-01（星期一）\n    assert instances[0] == datetime(2024, 1, 1, 0, 0, 0), \\\n        f\"Expected 2024-01-01, got {instances[0]}\"\n    \n    # 验证第二个实例：2024-01-08（星期一）\n    assert instances[1] == datetime(2024, 1, 8, 0, 0, 0), \\\n        f\"Expected 2024-01-08, got {instances[1]}\"\n    \n    # 验证第三个实例：2024-01-15（星期一）\n    assert instances[2] == datetime(2024, 1, 15, 0, 0, 0), \\\n        f\"Expected 2024-01-15, got {instances[2]}\"\n    \n    # 使用 WEEKLY 频率和多个 byweekday 参数，触发更复杂的星期计算\n    start2 = datetime(2023, 12, 30, 12, 0, 0)  # 2023-12-30 是星期六\n    rule2 = rrule(WEEKLY, dtstart=start2, byweekday=(SA, SU), count=4)\n    instances2 = list(rule2)\n    \n    # 验证：从星期六开始，应得到 12-30(六), 12-31(日), 01-06(六), 01-07(日)\n    assert instances2[0] == datetime(2023, 12, 30, 12, 0, 0)\n    assert instances2[1] == datetime(2023, 12, 31, 12, 0, 0), \\\n        f\"Expected 2023-12-31, got {instances2[1]}\"\n    assert instances2[2] == datetime(2024, 1, 6, 12, 0, 0), \\\n        f\"Expected 2024-01-06, got {instances2[2]}\"\n    assert instances2[3] == datetime(2024, 1, 7, 12, 0, 0), \\\n        f\"Expected 2024-01-07, got {instances2[3]}\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 10338,
+        "completion_tokens": 2592,
+        "total_tokens": 12930
+      }
+    },
+    {
+      "mutant_id": "40a5c3572975",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 923,
+      "operator": "AOR",
+      "description": "Add → Subtract",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import datetime, timedelta\nfrom dateutil.rrule import rrule, DAILY, WEEKLY, MONTHLY\n\ndef test_kill_mutation_line_923():\n    # Test 1: count with far future until - tests count limiting\n    start = datetime(2023, 1, 1, 0, 0, 0)\n    rule = rrule(DAILY, dtstart=start, count=3)\n    occurrences = list(rule)\n    \n    assert len(occurrences) == 3\n    assert occurrences[0] == start\n    assert occurrences[1] == start + timedelta(days=1)\n    assert occurrences[2] == start + timedelta(days=2)\n    \n    # Test 2: count=0 - should produce no results\n    start2 = datetime(2023, 2, 1, 6, 0, 0)\n    rule2 = rrule(DAILY, dtstart=start2, count=0)\n    occ2 = list(rule2)\n    assert len(occ2) == 0\n    \n    # Test 3: count=1 with weekly pattern\n    start3 = datetime(2023, 3, 1, 9, 0, 0)  # Wednesday\n    rule3 = rrule(WEEKLY, dtstart=start3, count=2)\n    occ3 = list(rule3)\n    \n    assert len(occ3) == 2\n    assert occ3[0] == datetime(2023, 3, 1, 9, 0, 0)\n    assert occ3[1] == datetime(2023, 3, 8, 9, 0, 0)\n    \n    # Test 4: Monthly rule with count\n    start4 = datetime(2023, 4, 15, 14, 30, 0)\n    rule4 = rrule(MONTHLY, dtstart=start4, count=3)\n    occ4 = list(rule4)\n    \n    assert len(occ4) == 3\n    assert occ4[0] == datetime(2023, 4, 15, 14, 30, 0)\n    assert occ4[1] == datetime(2023, 5, 15, 14, 30, 0)\n    assert occ4[2] == datetime(2023, 6, 15, 14, 30, 0)\n    \n    # Test 5: count with byweekday filter - tests counter with skipped dates\n    from dateutil.rrule import MO, WE, FR\n    start5 = datetime(2023, 7, 1, 8, 0, 0)  # Saturday\n    rule5 = rrule(DAILY, dtstart=start5, byweekday=(MO, WE, FR), count=4)\n    occ5 = list(rule5)\n    \n    # Expected: Jul 3 (Mon), Jul 5 (Wed), Jul 7 (Fri), Jul 10 (Mon)\n    assert len(occ5) == 4\n    assert occ5[0] == datetime(2023, 7, 3, 8, 0, 0)\n    assert occ5[1] == datetime(2023, 7, 5, 8, 0, 0)\n    assert occ5[2] == datetime(2023, 7, 7, 8, 0, 0)\n    assert occ5[3] == datetime(2023, 7, 10, 8, 0, 0)\n    \n    # Test 6: count with until that is reached before count (use until only)\n    start6 = datetime(2023, 8, 1, 12, 0, 0)\n    until6 = datetime(2023, 8, 2, 12, 0, 0)\n    rule6 = rrule(DAILY, dtstart=start6, until=until6)\n    occ6 = list(rule6)\n    \n    assert len(occ6) == 2\n    assert occ6[0] == datetime(2023, 8, 1, 12, 0, 0)\n    assert occ6[1] == datetime(2023, 8, 2, 12, 0, 0)\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 13218,
+        "completion_tokens": 4205,
+        "total_tokens": 17423
+      }
+    },
+    {
+      "mutant_id": "a5507d14019a",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 116,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import date\nfrom dateutil.relativedelta import relativedelta, MO, TU, WE, TH, FR, SA, SU\n\ndef test_relativedelta_line116_mutation():\n    # Test the case where the target day is within the month but the weekday\n    # adjustment needs to go backward across a month boundary.\n    # This targets the logic that handles the day overflow when combining\n    # day and weekday with negative offsets.\n    \n    # Case 1: day=1 with weekday=MO(-1) - should go to last Monday of previous month\n    d = date(2023, 5, 1)  # May 1, 2023 is a Monday\n    rd = relativedelta(day=1, weekday=MO(-1))\n    result = d + rd\n    # Expected: last Monday of April 2023 is April 24\n    assert result == date(2023, 4, 24)\n    \n    # Case 2: day=2 with weekday=TU(-1) - should go to last Tuesday of previous month\n    d2 = date(2023, 5, 2)  # May 2, 2023 is a Tuesday\n    rd2 = relativedelta(day=2, weekday=TU(-1))\n    result2 = d2 + rd2\n    # Expected: last Tuesday of April 2023 is April 25\n    assert result2 == date(2023, 4, 25)\n    \n    # Case 3: day=3 with weekday=WE(-1) - should go to last Wednesday of previous month\n    d3 = date(2023, 5, 3)  # May 3, 2023 is a Wednesday\n    rd3 = relativedelta(day=3, weekday=WE(-1))\n    result3 = d3 + rd3\n    # Expected: last Wednesday of April 2023 is April 26\n    assert result3 == date(2023, 4, 26)\n    \n    # Case 4: day=7 with weekday=SU(-1) - should go to last Sunday of previous month\n    d4 = date(2023, 5, 7)  # May 7, 2023 is a Sunday\n    rd4 = relativedelta(day=7, weekday=SU(-1))\n    result4 = d4 + rd4\n    # Expected: last Sunday of April 2023 is April 30\n    assert result4 == date(2023, 4, 30)\n    \n    # Case 5: day=1 with weekday=FR(-1) - should go to last Friday of previous month\n    d5 = date(2023, 5, 1)  # May 1, 2023 is a Monday\n    rd5 = relativedelta(day=1, weekday=FR(-1))\n    result5 = d5 + rd5\n    # Expected: last Friday of April 2023 is April 28\n    assert result5 == date(2023, 4, 28)\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 9861,
+        "completion_tokens": 2800,
+        "total_tokens": 12661
+      }
+    },
+    {
+      "mutant_id": "9c4fcef142bd",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 234,
+      "operator": "AOR",
+      "description": "Multiply → Divide",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import date\nfrom dateutil.relativedelta import relativedelta\n\ndef test_relativedelta_line234_mutation_kill_v3():\n    # Line 234 in relativedelta.py is in the __add__ method where\n    # it handles the case when self.weekday is not None and computes\n    # the number of days to add to reach the desired weekday.\n    # The mutation likely changes the comparison operator (e.g., > to >=)\n    # or the arithmetic in the weekday adjustment logic.\n    # \n    # The key insight: the code at line 234 likely computes:\n    #   days = (self.weekday - dt.weekday()) % 7\n    #   if days == 0 and self.weekday.n < 0: days = 7\n    #   elif days != 0 and self.weekday.n > 0: days = 7 - days\n    # A mutation could change the modulo operation, the comparison,\n    # or the arithmetic.\n    \n    # Test 1: Exact boundary where the weekday difference is 0\n    # and n is positive (should stay on same day)\n    start = date(2023, 1, 2)  # Monday (weekday=0)\n    delta = relativedelta(weekday=0)  # n defaults to 1, stay on Monday\n    result = start + delta\n    assert result == date(2023, 1, 2), f\"Expected 2023-01-02 but got {result}\"\n    \n    # Test 2: Exact boundary where the weekday difference is 0\n    # and n is negative (should go to previous occurrence)\n    # Use weekday with negative n via relativedelta(weekday=MO(-1))\n    from dateutil.relativedelta import MO\n    start2 = date(2023, 1, 2)  # Monday (weekday=0)\n    delta2 = relativedelta(weekday=MO(-1))  # previous Monday\n    result2 = start2 + delta2\n    assert result2 == date(2022, 12, 26), f\"Expected 2022-12-26 but got {result2}\"\n    \n    # Test 3: The weekday difference is exactly 1 day\n    # with n positive (should add 6 days to get to next week)\n    start3 = date(2023, 1, 3)  # Tuesday (weekday=1)\n    delta3 = relativedelta(weekday=0)  # next Monday\n    result3 = start3 + delta3\n    assert result3 == date(2023, 1, 9), f\"Expected 2023-01-09 but got {result3}\"\n    \n    # Test 4: The weekday difference is exactly 6 days\n    # with n positive (should add 1 day)\n    start4 = date(2023, 1, 1)  # Sunday (weekday=6)\n    delta4 = relativedelta(weekday=0)  # next Monday\n    result4 = start4 + delta4\n    assert result4 == date(2023, 1, 2), f\"Expected 2023-01-02 but got {result4}\"\n    \n    # Test 5: Using weekday with n=2 (second occurrence)\n    start5 = date(2023, 1, 1)  # Sunday\n    delta5 = relativedelta(weekday=MO(2))  # second Monday from now\n    result5 = start5 + delta5\n    assert result5 == date(2023, 1, 9), f\"Expected 2023-01-09 but got {result5}\"\n    \n    # Test 6: Using weekday with n=-2 (second previous occurrence)\n    start6 = date(2023, 1, 9)  # Monday\n    delta6 = relativedelta(weekday=MO(-2))  # second previous Monday\n    result6 = start6 + delta6\n    assert result6 == date(2022, 12, 26), f\"Expected 2022-12-26 but got {result6}\"\n    \n    # Test 7: Combined with month addition where month lands on\n    # the exact weekday boundary\n    start7 = date(2023, 1, 2)  # Monday\n    delta7 = relativedelta(months=1, weekday=0)  # Feb 2 is Thursday, next Monday is Feb 6\n    result7 = start7 + delta7\n    assert result7 == date(2023, 2, 6), f\"Expected 2023-02-06 but got {result7}\"\n    \n    # Test 8: Combined with month addition where month lands on\n    # the day before the desired weekday\n    start8 = date(2023, 1, 1)  # Sunday\n    delta8 = relativedelta(months=1, weekday=0)  # Feb 1 is Wednesday, next Monday is Feb 6\n    result8 = start8 + delta8\n    assert result8 == date(2023, 2, 6), f\"Expected 2023-02-06 but got {result8}\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 13479,
+        "completion_tokens": 4122,
+        "total_tokens": 17601
+      }
+    },
+    {
+      "mutant_id": "ffc59e202f2e",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 135,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import datetime\nfrom dateutil.tz.win import tzwinlocal\n\ndef test_tzwinlocal_utcoffset_consistency():\n    \"\"\"Test that tzwinlocal returns consistent UTC offsets for different dates.\"\"\"\n    tz = tzwinlocal()\n    \n    # Test dates across the year\n    test_dates = [\n        datetime(2023, 1, 15, 12, 0, 0),  # January\n        datetime(2023, 3, 15, 12, 0, 0),  # March\n        datetime(2023, 6, 15, 12, 0, 0),  # June\n        datetime(2023, 9, 15, 12, 0, 0),  # September\n        datetime(2023, 11, 15, 12, 0, 0), # November\n    ]\n    \n    offsets = set()\n    for dt in test_dates:\n        offset = tz.utcoffset(dt)\n        offsets.add(offset)\n    \n    # The timezone should have at least two different offsets across the year\n    # (one for standard time, one for daylight saving time)\n    assert len(offsets) >= 2\n    \n    # Verify that the offset is a multiple of 30 minutes (typical for timezones)\n    for offset in offsets:\n        total_minutes = offset.total_seconds() / 60\n        assert total_minutes % 30 == 0\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 7145,
+        "completion_tokens": 1668,
+        "total_tokens": 8813
+      }
+    },
+    {
+      "mutant_id": "31ed87866fa4",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 341,
+      "operator": "ROR",
+      "description": "NotEqual → Equal",
+      "arm": "blind",
+      "status": "killed",
+      "code": "import pytest\nfrom datetime import datetime\nfrom dateutil.tz.win import tzwin\n\ndef test_tzwin_ambiguous_time_handling():\n    # 获取一个已知有夏令时变化的时区（例如 \"Eastern Standard Time\"）\n    tz = tzwin('Eastern Standard Time')\n    \n    # 构造一个在 DST 回退期间（秋季）的模糊时间\n    # 2020年11月1日 凌晨1:30 在美东时区是模糊的（会重复一次）\n    dt_ambiguous = datetime(2020, 11, 1, 1, 30, 0)\n    \n    # 获取该时刻的 UTC offset\n    offset1 = tz.utcoffset(dt_ambiguous)\n    \n    # 获取该时刻的 DST 标志\n    dst1 = tz.dst(dt_ambiguous)\n    \n    # 验证该时刻确实存在 DST 变化（offset 不为零）\n    assert dst1.total_seconds() != 0\n    \n    # 验证 offset 是合理的（-5 或 -4 小时）\n    assert offset1.total_seconds() in (-5 * 3600, -4 * 3600)\n    \n    # 构造一个明确不在 DST 期间的 datetime（例如 2020年1月1日）\n    dt_standard = datetime(2020, 1, 1, 12, 0, 0)\n    offset_standard = tz.utcoffset(dt_standard)\n    \n    # 验证标准时间的 offset 是 -5 小时\n    assert offset_standard.total_seconds() == -5 * 3600\n    \n    # 验证模糊时间的 offset 与标准时间不同（说明处于 DST）\n    assert offset1 != offset_standard\n",
+      "rounds": 4,
+      "tautological_rounds": 0,
+      "saved_test": "C:\\Users\\lenovo、\\WorkBuddy\\2026-08-30-16-49-19\\MutLoop\\data\\s5\\generated_tests\\dateutil_win_L31ed8786.py",
+      "usage": {
+        "prompt_tokens": 3910,
+        "completion_tokens": 1060,
+        "total_tokens": 4970
+      }
+    },
+    {
+      "mutant_id": "0c371d2eed6e",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 777,
+      "operator": "CR",
+      "description": "0 → 1",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2.nodes import Node\n\ndef test_node_equality_with_same_type_different_attrs():\n    # Use a concrete node type with attributes to test equality comparison\n    from jinja2.nodes import Name\n    node1 = Name(name='x', ctx='load')\n    node2 = Name(name='y', ctx='load')\n    assert node1 != node2\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 3701,
+        "completion_tokens": 323,
+        "total_tokens": 4024
+      }
+    },
+    {
+      "mutant_id": "436346ef7913",
+      "project": "jinja",
+      "module": "environment.py",
+      "line": 1657,
+      "operator": "ROR",
+      "description": "LessThanEqual → LessThan",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2.environment import Environment\n\ndef test_kill_mutation_line_1657():\n    env = Environment()\n    source = \"Hello {{ name }}!\"\n    template = env.from_string(source)\n    \n    # 渲染模板，确保正常执行\n    result = template.render(name=\"World\")\n    assert result == \"Hello World!\"\n    \n    # 获取模板的编译代码对象\n    compiled_code = env.compile(source, None, None)\n    \n    # 验证编译结果是一个代码对象\n    assert hasattr(compiled_code, 'co_code')\n    assert compiled_code.co_name == '<module>'\n    \n    # 再次渲染以确保状态一致\n    result2 = template.render(name=\"Jinja\")\n    assert result2 == \"Hello Jinja!\"\n    \n    # 测试模板的元数据或属性访问\n    assert template.name is None\n    assert template.filename == '<template>'\n    \n    # 测试环境配置相关属性\n    assert env.autoescape is False\n    assert env.trim_blocks is False\n    assert env.lstrip_blocks is False\n    \n    # 测试模板的全局函数访问\n    assert 'range' in env.globals\n    assert 'dict' in env.globals\n    \n    # 测试模板的过滤器\n    assert 'upper' in env.filters\n    assert 'lower' in env.filters\n    \n    # 测试模板的测试器\n    assert 'defined' in env.tests\n    assert 'undefined' in env.tests\n    \n    # 测试模板的扩展\n    assert len(env.extensions) == 0\n    \n    # 测试模板的加载器\n    assert env.loader is None\n    \n    # 测试模板的字节码缓存\n    assert env.bytecode_cache is None\n    \n    # 测试模板的undefined行为\n    assert env.undefined is not None\n    \n    # 测试模板的finalize函数\n    assert env.finalize is None\n    \n    # 测试模板的auto_reload\n    assert env.auto_reload is True\n    \n    # 测试模板的policies\n    assert 'compiler.ascii_str' in env.policies\n    \n    # 测试模板的filters和tests的完整性\n    assert len(env.filters) > 0\n    assert len(env.tests) > 0\n    \n    # 测试模板的globals包含标准函数\n    assert callable(env.globals['range'])\n    assert callable(env.globals['dict'])\n    \n    # 测试模板的编译缓存\n    env.compile(source, None, None)\n    env.compile(source, None, None)  # 第二次调用以测试缓存\n    \n    # 测试模板的渲染结果\n    assert template.render(name=\"Test\") == \"Hello Test!\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 9357,
+        "completion_tokens": 3068,
+        "total_tokens": 12425
+      }
+    },
+    {
+      "mutant_id": "0bf228106e99",
+      "project": "jinja",
+      "module": "environment.py",
+      "line": 857,
+      "operator": "AOR",
+      "description": "LeftShift → RightShift",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2.environment import Environment\n\ndef test_environment_line_857_mutation():\n    env = Environment()\n    # 测试模板编译和渲染的基本功能\n    source = \"Hello {{ name }}!\"\n    template = env.from_string(source)\n    result = template.render(name=\"World\")\n    assert result == \"Hello World!\"\n    \n    # 测试模板的重新编译（不同源码）\n    template2 = env.from_string(\"{% if x %}yes{% else %}no{% endif %}\")\n    assert template2.render(x=True) == \"yes\"\n    assert template2.render(x=False) == \"no\"\n    \n    # 测试模板的渲染结果一致性\n    assert template.render(name=\"Jinja\") == \"Hello Jinja!\"\n    \n    # 测试模板的编译缓存行为（通过环境缓存）\n    env.cache.clear()\n    template3 = env.from_string(source)\n    assert template3.render(name=\"World\") == \"Hello World!\"\n    \n    # 测试模板的字节码缓存（如果启用）\n    env.bytecode_cache = None\n    template4 = env.from_string(source)\n    assert template4.render(name=\"Test\") == \"Hello Test!\"\n    \n    # 测试模板的异常处理\n    with pytest.raises(Exception):\n        env.from_string(\"{{ invalid syntax\")\n    \n    # 测试模板的加载器行为\n    from jinja2 import DictLoader\n    env2 = Environment(loader=DictLoader({\"test\": \"Hello {{ name }}!\"}))\n    template5 = env2.get_template(\"test\")\n    assert template5.render(name=\"Loader\") == \"Hello Loader!\"\n    \n    # 测试模板的继承和包含\n    env3 = Environment(loader=DictLoader({\n        \"base\": \"{% block content %}{% endblock %}\",\n        \"child\": \"{% extends 'base' %}{% block content %}Child content{% endblock %}\"\n    }))\n    template6 = env3.get_template(\"child\")\n    assert template6.render() == \"Child content\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 5792,
+        "completion_tokens": 1316,
+        "total_tokens": 7108
+      }
+    },
+    {
+      "mutant_id": "85f49894fca4",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 200,
+      "operator": "COR",
+      "description": "Or → And",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.utils import get_value, missing\n\ndef test_get_value_with_nested_key_and_default_none():\n    data = {\"a\": {\"b\": 1}}\n    assert get_value(data, \"a.c\", default=None) is None\n\ndef test_get_value_with_nested_key_and_no_default():\n    data = {\"a\": {\"b\": 1}}\n    assert get_value(data, \"a.c\") is missing\n\ndef test_get_value_with_existing_nested_key_and_default():\n    data = {\"a\": {\"b\": 1}}\n    assert get_value(data, \"a.b\", default=999) == 1\n\ndef test_get_value_with_top_level_missing_and_default():\n    data = {\"a\": 1}\n    assert get_value(data, \"b\", default=\"fallback\") == \"fallback\"\n\ndef test_get_value_with_nested_key_where_intermediate_is_none():\n    data = {\"a\": None}\n    assert get_value(data, \"a.b\", default=\"safe\") == \"safe\"\n\ndef test_get_value_with_nested_key_where_intermediate_is_list():\n    data = {\"a\": [1, 2, 3]}\n    assert get_value(data, \"a.1\", default=\"not_supported\") == \"not_supported\"\n\ndef test_get_value_with_nested_key_where_intermediate_is_string():\n    data = {\"a\": \"hello\"}\n    assert get_value(data, \"a.0\", default=\"str_default\") == \"str_default\"\n\ndef test_get_value_with_deep_nested_missing():\n    data = {\"a\": {\"b\": {\"c\": 1}}}\n    assert get_value(data, \"a.b.d\", default=\"deep_default\") == \"deep_default\"\n\ndef test_get_value_with_deep_nested_existing():\n    data = {\"a\": {\"b\": {\"c\": 1}}}\n    assert get_value(data, \"a.b.c\", default=\"wrong\") == 1\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 8822,
+        "completion_tokens": 2295,
+        "total_tokens": 11117
+      }
+    },
+    {
+      "mutant_id": "c4ca4fea7609",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 167,
+      "operator": "AOR",
+      "description": "Add → Subtract",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "from marshmallow.utils import get_value\nfrom marshmallow import missing\n\ndef test_get_value_with_missing_key_and_no_default():\n    data = {\"existing\": 1}\n    result = get_value(data, \"missing\")\n    assert result is missing\n\ndef test_get_value_with_nested_path_and_missing_intermediate():\n    data = {\"outer\": {\"inner\": 1}}\n    result = get_value(data, \"outer.missing\", default=\"fallback\")\n    assert result == \"fallback\"\n\ndef test_get_value_with_nested_path_and_existing_value():\n    data = {\"outer\": {\"inner\": 1}}\n    result = get_value(data, \"outer.inner\", default=\"fallback\")\n    assert result == 1\n\ndef test_get_value_with_none_value_and_no_default():\n    data = {\"key\": None}\n    result = get_value(data, \"key\")\n    assert result is None\n\ndef test_get_value_with_none_value_and_default():\n    data = {\"key\": None}\n    result = get_value(data, \"key\", default=\"fallback\")\n    assert result is None\n\ndef test_get_value_with_missing_key_and_default_none():\n    data = {\"existing\": 1}\n    result = get_value(data, \"missing\", default=None)\n    assert result is None\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 4516,
+        "completion_tokens": 869,
+        "total_tokens": 5385
+      }
+    },
+    {
+      "mutant_id": "f85007480a02",
+      "project": "marshmallow",
+      "module": "validate.py",
+      "line": 137,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.validate import Length\n\ndef test_length_with_none_min_and_max():\n    # Test Length with None values for both min and max\n    validator = Length(min=None, max=None)\n    \n    # Any string should pass when both are None\n    assert validator(\"\") == \"\"\n    assert validator(\"a\") == \"a\"\n    assert validator(\"a\" * 100) == \"a\" * 100\n    \n    # Test with only min=None and max set\n    validator2 = Length(min=None, max=5)\n    assert validator2(\"\") == \"\"\n    assert validator2(\"abcde\") == \"abcde\"\n    with pytest.raises(Exception):\n        validator2(\"abcdef\")\n    \n    # Test with only max=None and min set\n    validator3 = Length(min=2, max=None)\n    assert validator3(\"ab\") == \"ab\"\n    assert validator3(\"a\" * 100) == \"a\" * 100\n    with pytest.raises(Exception):\n        validator3(\"a\")\n\ndef test_length_with_zero_min():\n    # Test Length with min=0\n    validator = Length(min=0, max=5)\n    \n    # Empty string should pass when min=0\n    assert validator(\"\") == \"\"\n    assert validator(\"a\") == \"a\"\n    assert validator(\"abcde\") == \"abcde\"\n    with pytest.raises(Exception):\n        validator(\"abcdef\")\n\ndef test_length_with_zero_max():\n    # Test Length with max=0\n    validator = Length(min=0, max=0)\n    \n    # Only empty string should pass when max=0\n    assert validator(\"\") == \"\"\n    with pytest.raises(Exception):\n        validator(\"a\")\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6331,
+        "completion_tokens": 1382,
+        "total_tokens": 7713
+      }
+    },
+    {
+      "mutant_id": "64d08d707ccf",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 221,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.schema import Schema\nfrom marshmallow import fields\n\nclass TestSchemaMutation:\n    def test_schema_meta_ordered_with_unknown_fields(self):\n        \"\"\"Test that ordered=True preserves field order even with unknown fields in input.\"\"\"\n        \n        class TestSchema(Schema):\n            class Meta:\n                ordered = True\n                unknown = 'exclude'\n            b = fields.Int()\n            a = fields.Int()\n            c = fields.Int()\n        \n        schema = TestSchema()\n        # Input has extra unknown field and different order\n        result = schema.dump({\"x\": 99, \"c\": 3, \"a\": 2, \"b\": 1})\n        \n        # When ordered=True, output should follow field declaration order: b, a, c\n        # and exclude unknown field\n        assert list(result.keys()) == [\"b\", \"a\", \"c\"]\n        assert \"x\" not in result\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 5302,
+        "completion_tokens": 894,
+        "total_tokens": 6196
+      }
+    },
+    {
+      "mutant_id": "8469bddc0372",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 1090,
+      "operator": "ROR",
+      "description": "GreaterThan → GreaterThanEqual",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.schema import Schema\nfrom marshmallow import fields\n\nclass TestSchemaMutation:\n    def test_schema_meta_ordered_false_uses_field_declaration_order(self):\n        \"\"\"Test that when ordered=False (default), dump uses field declaration order.\"\"\"\n        class MySchema(Schema):\n            b = fields.Int()\n            a = fields.Int()\n            c = fields.Int()\n\n        schema = MySchema()\n        data = {\"a\": 1, \"b\": 2, \"c\": 3}\n        result = schema.dump(data)\n        # Default behavior: field declaration order (b, a, c)\n        assert list(result.keys()) == [\"b\", \"a\", \"c\"]\n\n    def test_schema_meta_ordered_true_uses_field_declaration_order(self):\n        \"\"\"Test that when ordered=True, dump also uses field declaration order.\"\"\"\n        class MySchema(Schema):\n            class Meta:\n                ordered = True\n            b = fields.Int()\n            a = fields.Int()\n            c = fields.Int()\n\n        schema = MySchema()\n        data = {\"a\": 1, \"b\": 2, \"c\": 3}\n        result = schema.dump(data)\n        # Field declaration order: b, a, c\n        assert list(result.keys()) == [\"b\", \"a\", \"c\"]\n\n    def test_schema_meta_ordered_false_with_unknown_fields(self):\n        \"\"\"Test that when ordered=False, unknown fields are not included in output.\"\"\"\n        class MySchema(Schema):\n            class Meta:\n                unknown = 'exclude'\n            b = fields.Int()\n            a = fields.Int()\n\n        schema = MySchema()\n        data = {\"a\": 1, \"b\": 2, \"c\": 3, \"d\": 4}\n        result = schema.dump(data)\n        # Only declared fields, in declaration order\n        assert list(result.keys()) == [\"b\", \"a\"]\n        assert result[\"b\"] == 2\n        assert result[\"a\"] == 1\n\n    def test_schema_meta_ordered_true_with_unknown_fields(self):\n        \"\"\"Test that when ordered=True, unknown fields are not included in output.\"\"\"\n        class MySchema(Schema):\n            class Meta:\n                ordered = True\n                unknown = 'exclude'\n            b = fields.Int()\n            a = fields.Int()\n\n        schema = MySchema()\n        data = {\"a\": 1, \"b\": 2, \"c\": 3, \"d\": 4}\n        result = schema.dump(data)\n        # Only declared fields, in declaration order\n        assert list(result.keys()) == [\"b\", \"a\"]\n        assert result[\"b\"] == 2\n        assert result[\"a\"] == 1\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6575,
+        "completion_tokens": 1907,
+        "total_tokens": 8482
+      }
+    },
+    {
+      "mutant_id": "8607eccf3b2d",
+      "project": "click",
+      "module": "types.py",
+      "line": 391,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.types import convert_type, Choice, STRING, INT\n\ndef test_convert_type_with_choice_and_case_sensitive():\n    # 测试 convert_type 函数在给定 Choice 类型时的行为\n    choice_type = Choice(['a', 'b', 'c'])\n    \n    # 调用 convert_type 函数，传入 Choice 类型\n    result = convert_type(choice_type)\n    \n    # 验证返回的类型仍然是 Choice 类型\n    assert isinstance(result, Choice)\n    \n    # 验证大小写敏感的行为（默认大小写敏感）\n    assert result.convert('a', None, None) == 'a'\n    assert result.convert('b', None, None) == 'b'\n    \n    # 测试传入字符串类型时的行为\n    result_str = convert_type(STRING)\n    assert result_str is STRING\n    \n    # 测试传入 None 类型时的行为\n    result_none = convert_type(None)\n    assert result_none is STRING\n    \n    # 测试传入 INT 类型时的行为\n    result_int = convert_type(INT)\n    assert result_int is INT\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 5596,
+        "completion_tokens": 1069,
+        "total_tokens": 6665
+      }
+    },
+    {
+      "mutant_id": "9778edb8a887",
+      "project": "click",
+      "module": "types.py",
+      "line": 923,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.types import convert_type\n\ndef test_convert_type_with_none():\n    \"\"\"Test that convert_type returns None for None input.\"\"\"\n    result = convert_type(None)\n    \n    assert result is None\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 3859,
+        "completion_tokens": 336,
+        "total_tokens": 4195
+      }
+    },
+    {
+      "mutant_id": "3544586c0528",
+      "project": "click",
+      "module": "parser.py",
+      "line": 473,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.parser import OptionParser, Option, Argument\n\ndef test_parser_line_473_mutation():\n    parser = OptionParser()\n    parser.add_option(Option(['--foo'], 'foo', nargs=1))\n    parser.add_argument(Argument(['bar'], 'bar', nargs=1))\n\n    # This input exercises the code path at line 473\n    # which handles the case where an option's value is missing\n    # and the next token is an argument (not an option).\n    # The mutation likely changes how this case is resolved.\n    result = parser.parse_args(['--foo', 'value', 'arg'])\n\n    # The expected behavior: --foo consumes 'value', and 'arg' is the positional\n    assert result[0]['foo'] == 'value'\n    assert result[1] == ['arg']\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 4901,
+        "completion_tokens": 907,
+        "total_tokens": 5808
+      }
+    },
+    {
+      "mutant_id": "6ce715a7c280",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 541,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.shell_completion import CompletionItem\n\ndef test_completion_item_help_text_behavior():\n    # 测试 help 参数为 None 的情况\n    item_none = CompletionItem(name=\"test\", value=\"test_value\", help=None)\n    assert item_none.help is None\n    \n    # 测试 help 参数为空字符串的情况\n    item_empty = CompletionItem(name=\"test\", value=\"test_value\", help=\"\")\n    assert item_empty.help == \"\"\n    \n    # 测试 help 参数包含特殊字符的情况\n    special_help = \"help with <special> & characters\"\n    item_special = CompletionItem(name=\"test\", value=\"test_value\", help=special_help)\n    assert item_special.help == special_help\n    \n    # 测试 help 参数与 name 相同的情况\n    item_same = CompletionItem(name=\"same\", value=\"test_value\", help=\"same\")\n    assert item_same.help == \"same\"\n    assert item_same.help == item_same.name\n    \n    # 测试 help 参数与 value 相同的情况\n    item_same_value = CompletionItem(name=\"test\", value=\"same_value\", help=\"same_value\")\n    assert item_same_value.help == \"same_value\"\n    assert item_same_value.help == item_same_value.value\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 4189,
+        "completion_tokens": 738,
+        "total_tokens": 4927
+      }
+    },
+    {
+      "mutant_id": "e8cde621800c",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 490,
+      "operator": "ROR",
+      "description": "Equal → NotEqual",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "from datetime import datetime\nfrom dateutil.rrule import rrule, YEARLY\n\ndef test_kill_mutation_line_490():\n    # Create a rule that should generate exactly 3 occurrences\n    rule = rrule(YEARLY, count=3, dtstart=datetime(2020, 1, 1))\n    \n    # Collect all occurrences\n    occurrences = list(rule)\n    \n    # The expected behavior: exactly 3 occurrences\n    assert len(occurrences) == 3\n    assert occurrences[0] == datetime(2020, 1, 1)\n    assert occurrences[1] == datetime(2021, 1, 1)\n    assert occurrences[2] == datetime(2022, 1, 1)\n    \n    # Verify that the rule is exhausted by checking that iterating again yields nothing\n    # Note: rrule objects are re-iterable, so we need to create a fresh iterator\n    # and check that it produces no more items after count is reached\n    iterator = iter(rule)\n    assert next(iterator) == datetime(2020, 1, 1)\n    assert next(iterator) == datetime(2021, 1, 1)\n    assert next(iterator) == datetime(2022, 1, 1)\n    # After count is reached, the iterator should be exhausted\n    try:\n        next(iterator)\n        # If we get here, the iterator was not exhausted - this is a failure\n        raise AssertionError(\"Iterator should be exhausted after count\")\n    except StopIteration:\n        pass\n",
+      "rounds": 5,
+      "tautological_rounds": 1,
+      "usage": {
+        "prompt_tokens": 5435,
+        "completion_tokens": 1413,
+        "total_tokens": 6848
+      }
+    },
+    {
+      "mutant_id": "0e9a7bbfd0a1",
+      "project": "dateutil",
+      "module": "rrule.py",
+      "line": 1202,
+      "operator": "AOR",
+      "description": "Subtract → Add",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import datetime\nfrom dateutil.rrule import rrule, MONTHLY\n\ndef test_mutation_kill():\n    # Test with byweekday as a negative integer (last day of month)\n    # This exercises the weekday index handling logic around line 1202\n    start = datetime(2020, 1, 1, 0, 0, 0)\n    \n    # byweekday=-1 means last day of month (any weekday)\n    rule = rrule(\n        freq=MONTHLY,\n        dtstart=start,\n        count=3,\n        byweekday=-1\n    )\n    \n    dates = list(rule)\n    \n    # Expected: last day of Jan, Feb, Mar 2020\n    expected = [\n        datetime(2020, 1, 31, 0, 0, 0),\n        datetime(2020, 2, 29, 0, 0, 0),\n        datetime(2020, 3, 31, 0, 0, 0)\n    ]\n    \n    assert dates == expected, f\"Expected {expected} but got {dates}\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 7644,
+        "completion_tokens": 1499,
+        "total_tokens": 9143
+      }
+    },
+    {
+      "mutant_id": "a5507d14019a",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 116,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom datetime import date\nfrom dateutil.relativedelta import relativedelta\n\ndef test_relativedelta_line116_mutation_kill_v4():\n    # Line 116 in relativedelta.py is in the __add__ method. Based on the\n    # source code structure, this line is likely part of the logic that\n    # handles the case when the relativedelta has both years and months\n    # specified, and it computes the target month/year before adjusting\n    # the day. A common mutation at this location would be changing\n    # something like `self.months` to `self.months + 1` or changing\n    # the sign of an operation, or altering the comparison for day clamping.\n    # To kill such a mutation, we need a test that is very sensitive to\n    # the exact month/year arithmetic when both years and months are present.\n    \n    # Test 1: A case where years and months combine to cross a leap year\n    # boundary and the day needs clamping. The mutation might affect\n    # whether we get Feb 28 or Mar 1 in a non-leap year.\n    d = date(2020, 1, 31)\n    # Add 1 year and 1 month: expected 2021-02-28 (since 2021 not leap)\n    result = d + relativedelta(years=1, months=1)\n    assert result == date(2021, 2, 28), f\"Test1: Expected 2021-02-28, got {result}\"\n    \n    # Test 2: Add 1 year and 2 months from Jan 31 2020 -> Mar 31 2021\n    # This tests that the month addition doesn't overflow incorrectly.\n    d2 = date(2020, 1, 31)\n    result2 = d2 + relativedelta(years=1, months=2)\n    assert result2 == date(2021, 3, 31), f\"Test2: Expected 2021-03-31, got {result2}\"\n    \n    # Test 3: A case with negative years and positive months\n    # From March 31 2020, subtract 1 year and add 1 month -> Feb 28 2019\n    # Wait: March 31 2020 - 1 year = March 31 2019, then +1 month = April 30 2019\n    # So the correct expected result is 2019-04-30, not 2019-02-28.\n    # Let's use a different combination that gives a clear expected result.\n    # From March 31 2020, subtract 1 year and subtract 1 month -> Feb 28 2019\n    d3 = date(2020, 3, 31)\n    result3 = d3 + relativedelta(years=-1, months=-1)\n    assert result3 == date(2019, 2, 28), f\"Test3: Expected 2019-02-28, got {result3}\"\n    \n    # Test 4: A case with positive years and negative months\n    # From March 31 2020, add 1 year and subtract 1 month -> Feb 28 2021\n    d4 = date(2020, 3, 31)\n    result4 = d4 + relativedelta(years=1, months=-1)\n    assert result4 == date(2021, 2, 28), f\"Test4: Expected 2021-02-28, got {result4}\"\n    \n    # Test 5: A case where the day is 31 and we add years+months to land\n    # on a month with 30 days, then continue to a month with 31 days\n    # to check if the day is correctly reset or preserved.\n    d5 = date(2020, 1, 31)\n    # Add 1 year and 1 month -> Feb 28 2021 (clamped)\n    r5 = d5 + relativedelta(years=1, months=1)\n    assert r5 == date(2021, 2, 28)\n    # Now add another year and 1 month from that result -> Mar 28 2022\n    r5b = r5 + relativedelta(years=1, months=1)\n    assert r5b == date(2022, 3, 28), f\"Test5: Expected 2022-03-28, got {r5b}\"\n    \n    # Test 6: A case with large month values that wrap around years\n    # From Jan 31 2020, add 13 months -> Feb 28 2021 (since 13 months = 1 year 1 month)\n    d6 = date(2020, 1, 31)\n    result6 = d6 + relativedelta(months=13)\n    assert result6 == date(2021, 2, 28), f\"Test6: Expected 2021-02-28, got {result6}\"\n    \n    # Test 7: A case with months=0 and years=1 from Feb 29 2020\n    # This tests the leap year handling when only years are added.\n    d7 = date(2020, 2, 29)\n    result7 = d7 + relativedelta(years=1)\n    assert result7 == date(2021, 2, 28), f\"Test7: Expected 2021-02-28, got {result7}\"\n    \n    # Test 8: A case with months=12 (which equals 1 year) from Feb 29 2020\n    d8 = date(2020, 2, 29)\n    result8 = d8 + relativedelta(months=12)\n    assert result8 == date(2021, 2, 28), f\"Test8: Expected 2021-02-28, got {result8}\"\n    \n    # Test 9: A very specific case that might be affected by a mutation\n    # at line 116. This line is likely in the __add__ method where it\n    # handles the case when self.years and self.months are both non-zero.\n    # A common mutation would be changing `self.months` to `self.months + 1`\n    # or changing the sign of the month adjustment. Let's test a case\n    # where the month addition would overflow into the next year.\n    d9 = date(2020, 11, 30)\n    # Add 1 year and 2 months: expected 2022-01-30\n    result9 = d9 + relativedelta(years=1, months=2)\n    assert result9 == date(2022, 1, 30), f\"Test9: Expected 2022-01-30, got {result9}\"\n    \n    # Test 10: A case with negative years and positive months that\n    # crosses a year boundary in the negative direction.\n    d10 = date(2020, 2, 29)\n    # Subtract 1 year and add 1 month: expected 2019-03-29\n    result10 = d10 + relativedelta(years=-1, months=1)\n    assert result10 == date(2019, 3, 29), f\"Test10: Expected 2019-03-29, got {result10}\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 15712,
+        "completion_tokens": 5335,
+        "total_tokens": 21047
+      }
+    },
+    {
+      "mutant_id": "bb6a63708ee4",
+      "project": "dateutil",
+      "module": "relativedelta.py",
+      "line": 235,
+      "operator": "AOR",
+      "description": "Multiply → Divide",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import unittest\nfrom datetime import date\nfrom dateutil.relativedelta import relativedelta\n\nclass TestRelativedeltaMutation(unittest.TestCase):\n    def test_kill_mutation_weekday_negative(self):\n        # Test case targeting relativedelta.py line 235\n        # Using negative weekday index (from end of week)\n        d = date(2023, 1, 1)  # Sunday\n        rd = relativedelta(weekday=6)  # Saturday (0=Monday, 6=Sunday)\n        result = d + rd\n        # From Sunday, next Saturday is 6 days later\n        self.assertEqual(result, date(2023, 1, 7))\n\n    def test_kill_mutation_weekday_same_day(self):\n        # Test case targeting relativedelta.py line 235\n        # When current day matches the weekday\n        d = date(2023, 1, 2)  # Monday\n        rd = relativedelta(weekday=0)  # Monday\n        result = d + rd\n        # Should stay on same day (no change)\n        self.assertEqual(result, date(2023, 1, 2))\n\n    def test_kill_mutation_weekday_rollover(self):\n        # Test case targeting relativedelta.py line 235\n        # Crossing month boundary\n        d = date(2023, 1, 31)  # Tuesday\n        rd = relativedelta(weekday=0)  # Monday\n        result = d + rd\n        # Next Monday is Feb 6\n        self.assertEqual(result, date(2023, 2, 6))\n\nif __name__ == '__main__':\n    unittest.main()\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6160,
+        "completion_tokens": 1616,
+        "total_tokens": 7776
+      }
+    },
+    {
+      "mutant_id": "9e7b6ce29359",
+      "project": "dateutil",
+      "module": "tz/win.py",
+      "line": 355,
+      "operator": "COR",
+      "description": "Or → And",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom dateutil.tz.win import tzwin\nfrom datetime import datetime\n\ndef test_tzwin_dst_transition():\n    # 测试夏令时转换边界 - 使用纽约时区（有DST）\n    tz = tzwin(\"Eastern Standard Time\")\n    \n    # 冬季时间（1月）- 应该是 EST (UTC-5)\n    winter_dt = datetime(2023, 1, 15, 12, 0, 0)\n    winter_offset = tz.utcoffset(winter_dt)\n    assert winter_offset is not None\n    assert winter_offset.total_seconds() == -5 * 3600\n    \n    # 夏季时间（7月）- 应该是 EDT (UTC-4)\n    summer_dt = datetime(2023, 7, 15, 12, 0, 0)\n    summer_offset = tz.utcoffset(summer_dt)\n    assert summer_offset is not None\n    assert summer_offset.total_seconds() == -4 * 3600\n    \n    # 验证两个偏移不同，确保DST逻辑被触发\n    assert winter_offset != summer_offset\n\ndef test_tzwin_dst_name():\n    # 测试DST时区名称\n    tz = tzwin(\"Eastern Standard Time\")\n    \n    # 冬季时间 - 应该是 \"Eastern Standard Time\"\n    winter_dt = datetime(2023, 1, 15, 12, 0, 0)\n    assert tz.tzname(winter_dt) == \"Eastern Standard Time\"\n    \n    # 夏季时间 - 应该是 \"Eastern Daylight Time\"\n    summer_dt = datetime(2023, 7, 15, 12, 0, 0)\n    assert tz.tzname(summer_dt) == \"Eastern Daylight Time\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 4978,
+        "completion_tokens": 978,
+        "total_tokens": 5956
+      }
+    },
+    {
+      "mutant_id": "0a4c2a9b5cd0",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 764,
+      "operator": "COR",
+      "description": "Or → And",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2.nodes import Const\n\ndef test_const_equality_with_same_value_different_types():\n    # Test that Const with same value but different Python types are not equal\n    c_int = Const(1)\n    c_bool = Const(True)\n    c_float = Const(1.0)\n    \n    # These should all be different because the underlying values are different types\n    assert c_int != c_bool\n    assert c_int != c_float\n    assert c_bool != c_float\n    \n    # Also test that Const with same value and same type are equal\n    c_int2 = Const(1)\n    assert c_int == c_int2\n    \n    # Test that Const with different values are not equal\n    c_int3 = Const(2)\n    assert c_int != c_int3\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 4743,
+        "completion_tokens": 800,
+        "total_tokens": 5543
+      }
+    },
+    {
+      "mutant_id": "e1983368b857",
+      "project": "jinja",
+      "module": "nodes.py",
+      "line": 866,
+      "operator": "ROR",
+      "description": "NotEqual → Equal",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2.nodes import Const\n\ndef test_const_node_equality_with_same_value():\n    # Create two Const nodes with the same value\n    node1 = Const(42)\n    node2 = Const(42)\n    \n    # Test equality between two identical Const nodes\n    assert node1 == node2\n    \n    # Test that equality is symmetric\n    assert node2 == node1\n    \n    # Test inequality with different value\n    node3 = Const(43)\n    assert node1 != node3\n    \n    # Test inequality with non-Const object\n    assert node1 != 42\n    \n    # Test that value is correctly stored\n    assert node1.value == 42\n    \n    # Test that Const nodes with different values are not equal\n    assert not (node1 == node3)\n    \n    # Test that Const nodes with same value are equal in both directions\n    assert node2 == node1 and node1 == node2\n    \n    # Test that Const nodes with different values are not equal in both directions\n    assert node3 != node1 and node1 != node3\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 5109,
+        "completion_tokens": 913,
+        "total_tokens": 6022
+      }
+    },
+    {
+      "mutant_id": "8a71cded172c",
+      "project": "jinja",
+      "module": "environment.py",
+      "line": 678,
+      "operator": "ARG",
+      "description": "TokenStream(stream, name, filename) → TokenStream(None, name, filename)",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom jinja2.environment import Environment\nfrom jinja2 import TemplateSyntaxError\n\ndef test_kill_mutation_line_678():\n    env = Environment()\n    # 尝试解析一个包含未闭合标签的模板，触发第678行附近的错误处理逻辑\n    with pytest.raises(TemplateSyntaxError) as excinfo:\n        env.parse(\"{% if true %}\")\n    # 断言错误信息中不包含特定内容，以区分变异前后的行为差异\n    assert \"elif\" not in str(excinfo.value)\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 4768,
+        "completion_tokens": 599,
+        "total_tokens": 5367
+      }
+    },
+    {
+      "mutant_id": "04b22a9dfd0b",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 345,
+      "operator": "COR",
+      "description": "Or → And",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.utils import get_value\n\ndef test_get_value_with_index_access():\n    data = {\"items\": [10, 20, 30]}\n    # 原代码：支持整数索引访问列表元素\n    # 变异可能：将索引访问改为键访问，导致返回 default 或 None\n    result = get_value(data, \"items.1\", default=None)\n    assert result == 20\n\ndef test_get_value_with_negative_index():\n    data = {\"items\": [10, 20, 30]}\n    # 原代码：支持负数索引从末尾访问\n    # 变异可能：负数索引处理错误，返回 default 或 None\n    result = get_value(data, \"items.-1\", default=None)\n    assert result == 30\n\ndef test_get_value_with_empty_string_key():\n    data = {\"\": \"empty_key\"}\n    # 原代码：空字符串作为键应能正常访问\n    # 变异可能：空字符串处理错误，返回 default 或 None\n    result = get_value(data, \"\", default=None)\n    assert result == \"empty_key\"\n\ndef test_get_value_with_boolean_key():\n    data = {True: \"true_key\"}\n    # 原代码：布尔值作为键应能正常访问\n    # 变异可能：布尔键处理错误，返回 default 或 None\n    result = get_value(data, True, default=None)\n    assert result == \"true_key\"\n\ndef test_get_value_with_int_key():\n    data = {1: \"int_key\"}\n    # 原代码：整数作为键应能正常访问\n    # 变异可能：整数键处理错误，返回 default 或 None\n    result = get_value(data, 1, default=None)\n    assert result == \"int_key\"\n\ndef test_get_value_with_nested_list_and_dict():\n    data = {\"a\": [{\"b\": 1}, {\"b\": 2}]}\n    # 原代码：支持混合嵌套访问\n    # 变异可能：混合路径解析错误\n    result = get_value(data, \"a.1.b\", default=None)\n    assert result == 2\n\ndef test_get_value_with_simple_key():\n    data = {\"key\": \"value\"}\n    # 原代码：简单键访问\n    # 变异可能：错误地处理简单键\n    result = get_value(data, \"key\", default=None)\n    assert result == \"value\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 9957,
+        "completion_tokens": 2692,
+        "total_tokens": 12649
+      }
+    },
+    {
+      "mutant_id": "260c2fd02673",
+      "project": "marshmallow",
+      "module": "utils.py",
+      "line": 166,
+      "operator": "ROR",
+      "description": "GreaterThan → GreaterThanEqual",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.utils import get_value\n\ndef test_get_value_with_missing_key_and_default():\n    data = {\"existing\": 1}\n    result = get_value(\"missing\", data, default=\"fallback\")\n    assert result == \"fallback\"\n\ndef test_get_value_with_existing_key():\n    data = {\"existing\": 1}\n    result = get_value(\"existing\", data, default=\"fallback\")\n    assert result == 1\n\ndef test_get_value_with_none_value_and_default():\n    data = {\"key\": None}\n    result = get_value(\"key\", data, default=\"fallback\")\n    assert result is None\n\ndef test_get_value_with_nested_path():\n    data = {\"a\": {\"b\": 2}}\n    result = get_value(\"a.b\", data, default=\"fallback\")\n    assert result == 2\n\ndef test_get_value_with_missing_nested_path():\n    data = {\"a\": {\"b\": 2}}\n    result = get_value(\"a.c\", data, default=\"fallback\")\n    assert result == \"fallback\"\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6639,
+        "completion_tokens": 1221,
+        "total_tokens": 7860
+      }
+    },
+    {
+      "mutant_id": "30cbb0be2367",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 223,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.schema import Schema\nfrom marshmallow import fields\n\nclass TestSchemaMutation:\n    def test_schema_meta_ordered_option(self):\n        \"\"\"Test that Schema.Meta.ordered affects field serialization order.\"\"\"\n        class OrderedSchema(Schema):\n            class Meta:\n                ordered = True\n            b = fields.Int()\n            a = fields.Int()\n            c = fields.Int()\n\n        class UnorderedSchema(Schema):\n            class Meta:\n                ordered = False\n            b = fields.Int()\n            a = fields.Int()\n            c = fields.Int()\n\n        data = {\"b\": 1, \"a\": 2, \"c\": 3}\n        ordered_result = OrderedSchema().dump(data)\n        unordered_result = UnorderedSchema().dump(data)\n\n        # For ordered schema, fields should be in declaration order: b, a, c\n        assert list(ordered_result.keys()) == [\"b\", \"a\", \"c\"]\n        # For unordered schema, fields should be sorted alphabetically: a, b, c\n        assert list(unordered_result.keys()) == [\"a\", \"b\", \"c\"]\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 5920,
+        "completion_tokens": 1200,
+        "total_tokens": 7120
+      }
+    },
+    {
+      "mutant_id": "9cf1cf976618",
+      "project": "marshmallow",
+      "module": "schema.py",
+      "line": 985,
+      "operator": "COR",
+      "description": "And → Or",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom marshmallow.schema import Schema\nfrom marshmallow import fields\nfrom marshmallow.exceptions import ValidationError\n\nclass TestSchemaMutation:\n    def test_schema_load_unknown_fields(self):\n        class UserSchema(Schema):\n            name = fields.String()\n            age = fields.Integer()\n            \n            class Meta:\n                unknown = 'raise'\n        \n        schema = UserSchema()\n        \n        # Test with valid data\n        valid_data = {\"name\": \"Alice\", \"age\": 30}\n        result = schema.load(valid_data)\n        assert result == {\"name\": \"Alice\", \"age\": 30}\n        \n        # Test with unknown field - this should raise if unknown='raise'\n        invalid_data = {\"name\": \"Bob\", \"age\": 25, \"email\": \"bob@example.com\"}\n        with pytest.raises(ValidationError):\n            schema.load(invalid_data)\n        \n        # Test with missing field\n        missing_data = {\"name\": \"Charlie\"}\n        with pytest.raises(ValidationError):\n            schema.load(missing_data)\n        \n        # Test with extra field but unknown='exclude'\n        class ExcludeSchema(Schema):\n            name = fields.String()\n            \n            class Meta:\n                unknown = 'exclude'\n        \n        exclude_schema = ExcludeSchema()\n        result = exclude_schema.load({\"name\": \"Dave\", \"extra\": 123})\n        assert result == {\"name\": \"Dave\"}\n        \n        # Test with extra field but unknown='include'\n        class IncludeSchema(Schema):\n            name = fields.String()\n            \n            class Meta:\n                unknown = 'include'\n        \n        include_schema = IncludeSchema()\n        result = include_schema.load({\"name\": \"Eve\", \"extra\": 456})\n        assert result == {\"name\": \"Eve\", \"extra\": 456}\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 7203,
+        "completion_tokens": 1775,
+        "total_tokens": 8978
+      }
+    },
+    {
+      "mutant_id": "25c899ce4570",
+      "project": "attrs",
+      "module": "validators.py",
+      "line": 465,
+      "operator": "ARG",
+      "description": "Call → Call",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom attr.validators import instance_of\n\n\ndef test_instance_of_with_non_type():\n    # instance_of requires a type argument; passing a non-type should raise TypeError\n    with pytest.raises(TypeError):\n        instance_of(42)\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 3545,
+        "completion_tokens": 300,
+        "total_tokens": 3845
+      }
+    },
+    {
+      "mutant_id": "b9c243addb8a",
+      "project": "click",
+      "module": "types.py",
+      "line": 393,
+      "operator": "CR",
+      "description": "SimpleString → SimpleString",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.types import IntRange\n\ndef test_int_range_clamp_with_open_bounds():\n    \"\"\"Test clamp behavior when bounds are open - exercises boundary logic\"\"\"\n    # min_open=True, max_open=True, clamp=True\n    int_range = IntRange(min=1, max=3, min_open=True, max_open=True, clamp=True)\n    \n    # Values below min should clamp to min+1 (since min is open)\n    assert int_range.convert(\"0\", None, None) == 2\n    # Values above max should clamp to max-1 (since max is open)\n    assert int_range.convert(\"5\", None, None) == 2\n    # Values within range pass through\n    assert int_range.convert(\"2\", None, None) == 2\n\ndef test_int_range_clamp_min_open_only():\n    \"\"\"Test clamp with only min_open=True\"\"\"\n    int_range = IntRange(min=1, max=3, min_open=True, clamp=True)\n    \n    # Below min clamps to min+1\n    assert int_range.convert(\"0\", None, None) == 2\n    # At min (open) should clamp to min+1 as well\n    assert int_range.convert(\"1\", None, None) == 2\n    # Within range passes\n    assert int_range.convert(\"2\", None, None) == 2\n    # At max (closed) passes\n    assert int_range.convert(\"3\", None, None) == 3\n    # Above max clamps to max\n    assert int_range.convert(\"4\", None, None) == 3\n\ndef test_int_range_clamp_max_open_only():\n    \"\"\"Test clamp with only max_open=True\"\"\"\n    int_range = IntRange(min=1, max=3, max_open=True, clamp=True)\n    \n    # Below min clamps to min\n    assert int_range.convert(\"0\", None, None) == 1\n    # At min (closed) passes\n    assert int_range.convert(\"1\", None, None) == 1\n    # Within range passes\n    assert int_range.convert(\"2\", None, None) == 2\n    # At max (open) should clamp to max-1\n    assert int_range.convert(\"3\", None, None) == 2\n    # Above max clamps to max-1\n    assert int_range.convert(\"4\", None, None) == 2\n\ndef test_int_range_clamp_single_value():\n    \"\"\"Test clamp with min=max\"\"\"\n    int_range = IntRange(min=5, max=5, clamp=True)\n    assert int_range.convert(\"4\", None, None) == 5\n    assert int_range.convert(\"5\", None, None) == 5\n    assert int_range.convert(\"6\", None, None) == 5\n\ndef test_int_range_clamp_negative_bounds():\n    \"\"\"Test clamp with negative bounds\"\"\"\n    int_range = IntRange(min=-3, max=-1, clamp=True)\n    assert int_range.convert(\"-5\", None, None) == -3\n    assert int_range.convert(\"-2\", None, None) == -2\n    assert int_range.convert(\"0\", None, None) == -1\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 9596,
+        "completion_tokens": 2738,
+        "total_tokens": 12334
+      }
+    },
+    {
+      "mutant_id": "acba36d2f921",
+      "project": "click",
+      "module": "parser.py",
+      "line": 146,
+      "operator": "CR",
+      "description": "\"\" → \"XXXX\"",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import pytest\nfrom click.parser import OptionParser, Option, Argument\n\ndef test_parser_146_mutation():\n    parser = OptionParser()\n    parser.add_option(Option(['--foo'], 'foo', 'foo', nargs=1))\n    parser.add_argument(Argument(['bar'], 'bar', 'bar', nargs=1))\n\n    args = ['--foo', 'value', 'positional']\n    opts, positional = parser.parse_args(args)\n\n    assert opts['foo'] == 'value'\n    assert positional == ['positional']\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 4782,
+        "completion_tokens": 600,
+        "total_tokens": 5382
+      }
+    },
+    {
+      "mutant_id": "e2964dca6ef9",
+      "project": "click",
+      "module": "shell_completion.py",
+      "line": 364,
+      "operator": "CR",
+      "description": "\"COMP_WORDS\" → \"XXCOMP_WORDSXX\"",
+      "arm": "blind",
+      "status": "suspected_equivalent",
+      "code": "import os\nimport tempfile\nfrom click.shell_completion import CompletionItem\n\ndef test_completion_item_help_text_behavior():\n    # Create a CompletionItem with a help text that contains special characters\n    item = CompletionItem(name=\"test\", value=\"test_value\", help=\"help with <special> & chars\")\n    \n    # The help_text property should return the help value we passed in\n    # This is the key behavior that might be affected by the mutation\n    assert item.help_text == \"help with <special> & chars\"\n    \n    # Test with empty help\n    item2 = CompletionItem(name=\"test2\", value=\"test2_value\", help=\"\")\n    assert item2.help_text == \"\"\n    \n    # Test with None help (default)\n    item3 = CompletionItem(name=\"test3\", value=\"test3_value\")\n    assert item3.help_text == \"\"\n    \n    # Test with help containing newlines\n    item4 = CompletionItem(name=\"test4\", value=\"test4_value\", help=\"line1\\nline2\")\n    assert item4.help_text == \"line1\\nline2\"\n    assert \"\\n\" in item4.help_text\n",
+      "rounds": 5,
+      "tautological_rounds": 0,
+      "usage": {
+        "prompt_tokens": 6192,
+        "completion_tokens": 1351,
+        "total_tokens": 7543
+      }
+    }
+  ]
+}
